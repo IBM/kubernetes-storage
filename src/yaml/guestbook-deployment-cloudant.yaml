@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: guestbook-cloudant
+  labels:
+    app: guestbook
+spec:
+  selector:
+    matchLabels:
+      app: guestbook
+  template:
+    metadata:
+      labels:
+        app: guestbook
+    spec:
+      containers:
+      - name: guestbook
+        image: jzaccone/guestbook-nodejs:cloudant
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - name: http
+          containerPort: 3000
+        env:
+        - name: CLOUDANT_URL
+          valueFrom:
+            secretKeyRef: 
+              name: binding-cloudant
+              key: url
+        - name : CLOUDANT_DB
+          value: "test"
