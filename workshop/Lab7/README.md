@@ -26,7 +26,7 @@ Expand the credential and take note of the **url** parameter. We will be using t
 
 ### Save your credentials in a Kubernetes `secret`
 
-k
+TODO `kubectl create url secret`
 
 
 Once completed, [skip ahead to the next section](##Next-Steps)
@@ -37,7 +37,7 @@ The Operator Framework provides support for Kubernetes-native extensions to mana
 
 With the IBM Cloud Kubernetes Service clusters at version 1.16 and later, the Operator Framework is already installed. So all you will need to do is install the IBM Cloud Operator. New clusters created after March 1st, 2020 should all be at this level (or later).
 
-## Installing the IBM Cloud operator
+### Installing the IBM Cloud operator
 
 1. With the OLM framework and marketplace support installed, it's time to install the IBM Cloud operator. This operator will use an IBM Cloud API key to manage resources within the cluster. Begin to configure the IBM Cloud operator by logging in to the IBM Cloud account using the IBM Cloud CLI. Start by logging in to IBM Cloud
 
@@ -98,7 +98,7 @@ With the IBM Cloud Kubernetes Service clusters at version 1.16 and later, the Op
     ibmcloud-operator-system   ibmcloud-operator-controller-manager-56c8548f89-stzdq   2/2     Running   0          14m
     ```
 
-## Understanding Operators
+### Understanding Operators
 
 The [Operator Pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) is an emerging approach to extend through automation the expertise of human operators into the cluster environment. Operators are intended to support applications and management of other resources in and related to kubernetes clusters starting at installation, but continuing to day 2 operations of monitoring, backup, fault recovery and, of course, updates.
 
@@ -111,11 +111,11 @@ In addition to the IBM Cloud Operator, there are many operators that can manage 
 Your cluster now has the IBM Cloud operator installed. This operator is able to configure two custom resources in the cluster, a **Service** and a **Binding**. The **Service** defines a specific IBM Cloud service instance type to create, and the **Binding** specifies a named binding of a service instance to a secret in the cluster. For more details about the IBM Cloud operator see the [project repository](https://github.com/IBM/cloud-operators)
 
 
-# Creating an instance of Cloudant
+### Creating an instance of Cloudant
 
 For an application running within a Kubernetes cluster to be able to access an IBM Cloud service, the service needs to be created and the credentials to access the service must be added to the cluster so that they can be read by deployed applications. The Kubernetes cluster running the application accessing the service instance can be anywhere, but in this case you'll be using your Kubernetes cluster on IBM Cloud. We will be using a Cloudant DB service on IBM Cloud for this lab because it is free, json document datastore that will be easy for us to swap from our previous MongoDB database connection.
 
-## Create the service instance and bind to the cluster
+### Create the service instance and bind to the cluster
 
 1. Change into the `yaml` directory. apply the `cloudant-ibmcloud.yaml` file.
 
@@ -153,14 +153,14 @@ For an application running within a Kubernetes cluster to be able to access an I
 
     With the credentials added to the current namespace, you will be able to deploy guestbook application that uses the analyzer microservice. But first, let's do a little checking of the actions by the IBM Cloud operator.
 
-## Debug
+### Debug
     If the credentials have not been created after a few moments, check the logs of the kubernetes object you created.
 
     ```
     kubectl describe service.ibmcloud.ibm.com/mycloudant
     ```
 
-## Check the IBM Cloud console - verify the Cloudant DB service
+### Check the IBM Cloud console - verify the Cloudant DB service
 
 You can return to your IBM Cloud console and see that the tone analyzer service was created as specified in the `cloudant-ibmcloud.yaml` resource file.
 
@@ -183,7 +183,7 @@ You can return to your IBM Cloud console and see that the tone analyzer service 
 
     Notice how the string displayed is exactly the same as the service API Key visible from the control panel for the service.
 
-## Lifecycle management with the IBM Cloud operator
+### Lifecycle management with the IBM Cloud operator
 
 Let's take a look at the custom resource definition (CRD) file that was used in this exercise (`cloudant-ibmcloud.yaml`).
 
