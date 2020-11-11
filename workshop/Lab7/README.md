@@ -3,6 +3,7 @@ This lab configures our nodejs guestbook Application to connect to an external d
 
 ## Approach 1: Manually create database service on IBM Cloud console
 
+### Create a Cloudant DB service
 In these steps will be using a free `lite` CloudantDB on IBM Cloud using your free IBM Cloud account. [Create an account](https://cloud.ibm.com/registration) if you haven't already.
 
 Navigate to the [IBM Cloud Catalog](https://cloud.ibm.com/catalog). Make sure your personal account in selected in the dropdown in the upper right. Select the Cloudant tile.
@@ -13,6 +14,22 @@ Set the instance name to "mycloudant". Ensure the "Lite" plan is selected. Then 
 
 ![Install CloudantDB from console](../.gitbook/assets/install-cloudant-console.png)
 
+### Create a credential for your CloudantDB service
+
+Locate your credentials in your CloudantDB service on IBM Cloud. From the Cloudant DB service, select **Service Credentials** on the left. Then click the blue **New credential** on the right.
+
+![create new credentials](../.gitbook/assets/cloudant-service-creds.png)
+
+Select the default name and role (should be `manager`) for the credentials, and click **Create**.
+
+Expand the credential and take note of the **url** parameter. We will be using this value to populate a Kubernetes secret in the next step.
+
+### Save your credentials in a Kubernetes `secret`
+
+k
+
+
+Once completed, [skip ahead to the next section](##Next-Steps)
 
 ## Approach 2: Use the IBM Cloud Operator to provision and manage the database instance on IBM Cloud
 
@@ -194,9 +211,32 @@ Note that the API version is different from what you may have seen in other reso
 The role of the IBM Cloud operator is to manage instances of these services and also create a **Binding** to the service that is stored as a secret in the cluster.
 The operator will monitor the IBM Cloud account service instances. If something happens to the service instance, the operator will detect the change and take action. For example, if a the service instance is deleted, the operator will create a new service instance and update the credentials stored in the binding secret.
 
-## Modify the guestbook application to read from CloudantDB
+## Next Steps
 
-The credentials information is created for your automatically and saved in a Kubernetes `secret`, but your'll have to make minor changes to the Guestbook nodejs application to read from your newly created CloudantDB service.
+Regardless of whether you did approach 1 or approach 2, the end result is the same. You should now have a CloudantDB service created on IBM Cloud with credentials to that service saved inside your Kubernetes as a `secret`. The next steps walk you through 
+
+1) Create a new database on the CloudantDB Service
+1) Modify the guestbook application to read from CloudantDB
+1) Build and push a new guestbook docker image
+1) Edit the Kubernetes deployment yaml files to pull the new version of the application AND the credentials saved in the secret
+1) Check your changes by deploying to Kubernetes and testing the application
+
+
+### Create a new database on the CloudantDB service
+
+From your newly created Cloudant service on the IBM Cloud console, click "launch dashboard"
+
+![launch cloudant dashboard](../.gitbook/assets/cloudant-launch-dashboard.png)
+
+Use your IBM Credentials to login if necessary. From the Cloudant Dashboard screen, click "Create Database" and give it name, such as "mydatabase"
+
+![launch cloudant dashboard](../.gitbook/assets/cloudant-create-db.png)
+
+Remember this name as we will be using it later when we deploy our application.
+
+### Modify the guestbook application to read from CloudantDB
+
+You will have to make minor changes to the Guestbook nodejs application to read from your newly created CloudantDB service.
 
 Download the guestbook application if you haven't already.
 
@@ -243,7 +283,7 @@ Reference the datasource you just created in `src/server/model-config.json` as s
     }
   ```
 
-## Build a new Docker Images
+### Build and push a new docker image
 
 In order to deploy to kubernetes, we will need a Docker Image saved to a registry somewhere. In this lab, we will build an image locally and push directly to DockerHub. In real-life, we would use CI/CD process to build and push our docker image from source control.
 
@@ -259,7 +299,7 @@ Build the docker image
 Your guestbook application is all set to talk to a Cloudant database. Next, we will configure our Kubernetes deployment to use the image you just pushed, and to load the missing environment variables: `CLOUDANT_URL` and `CLOUDANT_DB` from our `binding-cloudant` secret.
 
 
-## Configure Kubernetes yamls
+### Configure Kubernetes yamls
 
 We have a yaml file create for you, but you will need to enter the location of the Docker Image you built in the previous step.
 
@@ -303,7 +343,7 @@ Replace `[IMAGE_NAME]` in the file [guestbook-deployment-cloudant.yaml](../../sr
 
 Notice how we load the environment variable `CLOUDANT_URL` from the `binding-cloudant` secreat that we created for us by the IBM Cloud Operator. This yaml files now defines all the environment variables our guestbook application needs to connect to our Cloudant DB.
 
-## Finally: Deploy to Kubernetes
+### Test your changes by deploying to Kubernetes
 
 Deploy to kubernetes using `kubectl apply`:
 
