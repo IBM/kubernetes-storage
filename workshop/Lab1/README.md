@@ -54,6 +54,7 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 guestbook-primary-pv                       10Gi       RWO            Retain           Available                           manual                      13s
 ```
 
+Next 
 PVC yaml:
 ```
 apiVersion: v1
@@ -82,136 +83,223 @@ guestbook-local-pvc   Bound    guestbook-local-pv                         10Gi  
 
 ## Guestbook application using storage
 
-The application is the [Guestbook App](https://github.com/IBM/guestbook-nodejs), which is a sample multi-tier web application.
+The application is the [Guestbook App](https://github.com/IBM/guestbook-nodejs), which is a simple multi-tier web application built using the loopback framework.
 
+Change to the guestbook application source directory:
 
-Build the image
-Misc: (building v3 image)
 ```
-docker build -t rojanjose/guestbook:v31 .
-docker push rojanjose/guestbook:v31
-https://hub.docker.com/repository/docker/rojanjose/guestbook/tags?page=1
+cd $HOME/guestbook-nodejs/src
+```
+Review the source `common/models/entry.js`. The application uses storage allocated using `hostPath` to store data cache in the file `data/cache.txt`. The file `logs/debug.txt` records debug messages and is provisioned via the `emptyDir` storage type.
+
+```source
+module.exports = function(Entry) {
+
+    Entry.greet = function(msg, cb) {
+
+        // console.log("testing " + msg);
+        fs.appendFile('logs/debug.txt', "Recevied message: "+ msg +"\n", function (err) {
+            if (err) throw err;
+            console.log('Debug stagement printed');
+        });
+
+        fs.appendFile('data/cache.txt', msg+"\n", function (err) {
+            if (err) throw err;
+            console.log('Saved in cache!');
+        });
+
+...
 ```
 
+Run the commands listed below to build the guestbook image and copy into docker hub registry:
 
-Main.go file:
-Line 186
 ```
-//Setip data file
-	f, err := os.OpenFile("data/datafile.txt", os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
-	
+cd $HOME/guestbook-nodejs/src
+docker build -t $DOCKERUSER/guestbook-nodejs:storage .
+export DOCKERUSER=rojanjose
+docker login -u DOCKERUSER
+docker push $DOCKERUSER/guestbook-nodejs:storage
 ```
 
-Deployment yaml:
+Review the deployment yaml file `guestbook-deplopyment.yaml` prior to deploying the application into the cluster.
+
+```
+cd $HOME/storage/lab1
+cat guestbook-deplopyment.yaml
+```
+
+The section `spec.volumes` lists `hostPath` and `emptyDir` volumes. The section `spec.containers.volumeMounts` lists the mount paths that the application uses to write in the volumes.
+
 ```
 apiVersion: apps/v1
 kind: Deployment
-...
+metadata:
+  name: guestbook-v1
+  labels:
+    app: guestbook
+ ...
     spec:
       containers:
         - name: guestbook
-          image: rojanjose/guestbook:v31
+          image: rojanjose/guestbook-nodejs:storage
+          imagePullPolicy: Always
           ports:
           - name: http-server
             containerPort: 3000
           volumeMounts:
-          - name: guestbook-data-volume
-            mountPath: /app/data
+          - name: guestbook-primary-volume
+            mountPath: /home/node/app/data
+          - name: guestbook-secondary-volume
+            mountPath: /home/node/app/logs
       volumes:
-      - name: guestbook-data-volume
+      - name: guestbook-primary-volume
         persistentVolumeClaim:
-          claimName: guestbook-local-pvc
+          claimName: guestbook-primary-pvc
+      - name: guestbook-secondary-volume
+        emptyDir: {}
+  
+
+...
 ```
 
 Deploy Guestbook application:
 
 ```
-❯ kubectl create -f guestbook-deployment.yaml
+kubectl create -f guestbook-deployment.yaml
 deployment.apps/guestbook-v1 created
-❯ kubectl get pods
+
+kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 guestbook-v1-6f55cb54c5-jb89d   1/1     Running   0          14s
-❯ kubectl create -f guestbook-service.yaml
+
+kubectl create -f guestbook-service.yaml
 service/guestbook created
 ```
 
-Load data:
+Find the URL for the guestbook application by joining the worker node external IP and service node port.
 
-![Guestbook images](images/guestbook-local-data.png)
+```
+HOSTNAME=`ibmcloud ks workers --cluster $CLUSTERNAME | grep Ready | head -n 1 | awk '{print $2}'`
+SERVICEPORT=`kubectl get svc guestbook -o=jsonpath='{.spec.ports[0].nodePort}'`
+echo "http://$HOSTNAME:$SERVICEPORT"
+```
 
+Open the URL in a browser and create guest book entries.
+
+![Guestbook entries](images/lab1-guestbook-entries.png)
 
 Log into the pod:
 
 ```
-kubectl exec -it guestbook-v1-6f55cb54c5-jb89d --  busybox sh
+kubectl exec -it guestbook-v1-6f55cb54c5-jb89d bash
+
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# ls -al
+total 256
+drwxr-xr-x   1 root root   4096 Nov 11 23:40 .
+drwxr-xr-x   1 node node   4096 Nov 11 23:20 ..
+-rw-r--r--   1 root root     12 Oct 29 21:00 .dockerignore
+-rw-r--r--   1 root root    288 Oct 29 21:00 .editorconfig
+-rw-r--r--   1 root root      8 Oct 29 21:00 .eslintignore
+-rw-r--r--   1 root root     27 Oct 29 21:00 .eslintrc
+-rw-r--r--   1 root root    151 Oct 29 21:00 .gitignore
+-rw-r--r--   1 root root     30 Oct 29 21:00 .yo-rc.json
+-rw-r--r--   1 root root    105 Oct 29 21:00 Dockerfile
+drwxr-xr-x   2 root root   4096 Nov 11 03:40 client
+drwxr-xr-x   3 root root   4096 Nov 10 23:04 common
+drwxr-xr-x   2 root root   4096 Nov 11 23:16 data
+drwxrwxrwx   2 root root   4096 Nov 11 23:44 logs
+drwxr-xr-x 439 root root  16384 Nov 11 23:20 node_modules
+-rw-r--r--   1 root root 176643 Nov 11 23:20 package-lock.json
+-rw-r--r--   1 root root    830 Nov 11 23:20 package.json
+drwxr-xr-x   3 root root   4096 Nov 10 23:04 server
+
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# cat data/cache.txt
+Hello Kubernetes!
+Hola Kubernetes!
+Zdravstvuyte Kubernetes!
+Nǐn hǎo Kubernetes!
+Goedendag Kubernetes!
+
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# cat logs/debug.txt
+Recevied message: Hello Kubernetes!
+Recevied message: Hola Kubernetes!
+Recevied message: Zdravstvuyte Kubernetes!
+Recevied message: Nǐn hǎo Kubernetes!
+Recevied message: Goedendag Kubernetes!
 
 
-BusyBox v1.21.1 (Ubuntu 1:1.21.0-1ubuntu1) built-in shell (ash)
-Enter 'help' for a list of built-in commands.
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# df -h
+Filesystem               Size  Used Avail Use% Mounted on
+overlay                   98G  3.5G   90G   4% /
+tmpfs                     64M     0   64M   0% /dev
+tmpfs                    7.9G     0  7.9G   0% /sys/fs/cgroup
+/dev/mapper/docker_data   98G  3.5G   90G   4% /etc/hosts
+shm                       64M     0   64M   0% /dev/shm
+/dev/xvda2                25G  3.6G   20G  16% /home/node/app/data
+tmpfs                    7.9G   16K  7.9G   1% /run/secrets/kubernetes.io/serviceaccount
+tmpfs                    7.9G     0  7.9G   0% /proc/acpi
+tmpfs                    7.9G     0  7.9G   0% /proc/scsi
+tmpfs                    7.9G     0  7.9G   0% /sys/firmware
 
-/app # cat data/datafile.txt
-2020/11/04 05:14:29 Logging guestbook data:
-2020/11/04 05:20:14 One
-2020/11/04 05:20:17 Two
-2020/11/04 05:20:20 Three
-
-/app # df -ah
-Filesystem                Size      Used Available Use% Mounted on
-overlay                  97.9G      1.4G     91.5G   2% /
-proc                         0         0         0   0% /proc
-tmpfs                    64.0M         0     64.0M   0% /dev
-devpts                       0         0         0   0% /dev/pts
-cgroup                       0         0         0   0% /sys/fs/cgroup/perf_event
-...
-
-/dev/xvda2               24.2G      2.2G     20.8G   9% /app/data
-...
-tmpfs                     7.8G         0      7.8G   0% /sys/firmware
 ```
 
-Kill the pod:
+Kill the pod to see the impact of deleting the pod on data.
 
 ```
 kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 guestbook-v1-6f55cb54c5-jb89d   1/1     Running   0          12m
-❯
-❯
-❯ kubectl delete pod guestbook-v1-6f55cb54c5-jb89d
+
+kubectl delete pod guestbook-v1-6f55cb54c5-jb89d
 pod "guestbook-v1-6f55cb54c5-jb89d" deleted
-❯ kubectl get pods
+
+kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
-guestbook-v1-6f55cb54c5-gctwt   1/1     Running   0          11s
+guestbook-v1-5cbc445dc9-sx58j   1/1     Running   0          86s
 ```
 
-![Guestbook images](images/guestbook-local-data-deleted.png)
+![Guestbook delete data](images/lab1-guestbook-data-deleted.png)
 
-Enter data:
-![Guestbook images](images/guestbook-local-data-reload.png)
+Enter new data:
+![Guestbook reload](images/lab1-guestbook-data-reload.png)
 
+Log into the pod to view the state of the data.
 
 ```
-kubectl exec -it guestbook-v1-6f55cb54c5-gctwt --  busybox sh
+kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+guestbook-v1-5cbc445dc9-sx58j   1/1     Running   0          86s
 
+kubectl exec -it guestbook-v1-5cbc445dc9-sx58j bash
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
 
-BusyBox v1.21.1 (Ubuntu 1:1.21.0-1ubuntu1) built-in shell (ash)
-Enter 'help' for a list of built-in commands.
+root@guestbook-v1-5cbc445dc9-sx58j:/home/node/app# cat data/cache.txt
+Hello Kubernetes!
+Hola Kubernetes!
+Zdravstvuyte Kubernetes!
+Nǐn hǎo Kubernetes!
+Goedendag Kubernetes!
+Bye Kubernetes!
+Aloha Kubernetes!
+Ciao Kubernetes!
+Sayonara Kubernetes!
 
-/app # ls -alt
-total 8972
-drwxr-xr-x    1 root     root          4096 Nov  4 05:27 .
-drwxr-xr-x    1 root     root          4096 Nov  4 05:27 ..
-drwxr-xr-x    2 root     root          4096 Nov  4 05:14 data
-drwxr-xr-x    1 root     root          4096 Nov  4 05:12 public
--rwxr-xr-x    1 root     root       9167339 Nov  4 05:12 guestbook
-/app # cat data/datafile.txt
-2020/11/04 05:14:29 Logging guestbook data:
-2020/11/04 05:20:14 One
-2020/11/04 05:20:17 Two
-2020/11/04 05:20:20 Three
-2020/11/04 05:27:20 Logging guestbook data:
-2020/11/04 05:32:04 Four
-2020/11/04 05:32:07 Five
-2020/11/04 05:32:08 Six
+root@guestbook-v1-5cbc445dc9-sx58j:/home/node/app# cat logs/debug.txt
+Recevied message: Bye Kubernetes!
+Recevied message: Aloha Kubernetes!
+Recevied message: Ciao Kubernetes!
+Recevied message: Sayonara Kubernetes!
+root@guestbook-v1-5cbc445dc9-sx58j:/home/node/app#
 ```
 
+This shows that the storage type `emptyDir` loose data on a pod restart where as `hostPath` data lives until the worker node or cluster is deleted.
+
+
+## Clean up
+
+```
+cd $HOME/guestbook-config/storage/lab1
+kubectl delete -f .
+```
