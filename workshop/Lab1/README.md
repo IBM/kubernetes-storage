@@ -22,7 +22,7 @@ From the cloud shell prompt, run the following commands to get the guestbook app
 cd $HOME
 git clone --branch fs https://github.com/IBM/guestbook-nodejs.git
 git clone --branch storage https://github.com/rojanjose/guestbook-config.git
-cd $HOME/guestbook-config/storage
+cd $HOME/guestbook-config/storage/lab1
 ```
 
 Let's start with reserving the Persistent volume from the primary storage.
@@ -74,7 +74,7 @@ spec:
 Create PVC:
 
 ```
-kubectl create -f guestbook-local-pvc.yaml
+kubectl create -f pvc-hostpath.yaml
 persistentvolumeclaim/guestbook-local-pvc created
 ❯ kubectl get pvc
 NAME                  STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS       AGE
@@ -115,7 +115,6 @@ module.exports = function(Entry) {
 Run the commands listed below to build the guestbook image and copy into the docker hub registry:
 
 ```
-cd $HOME/guestbook-nodejs/src
 docker build -t $DOCKERUSER/guestbook-nodejs:storage .
 docker login -u $DOCKERUSER
 docker push $DOCKERUSER/guestbook-nodejs:storage
@@ -180,7 +179,7 @@ service/guestbook created
 Find the URL for the guestbook application by joining the worker node external IP and service node port.
 
 ```
-HOSTNAME=`ibmcloud ks workers --cluster $CLUSTERNAME | grep Ready | head -n 1 | awk '{print $2}'`
+HOSTNAME=`kubectl get nodes -o wide | tail -n 1 | awk '{print $7}'`
 SERVICEPORT=`kubectl get svc guestbook -o=jsonpath='{.spec.ports[0].nodePort}'`
 echo "http://$HOSTNAME:$SERVICEPORT"
 ```
@@ -189,12 +188,10 @@ Open the URL in a browser and create guest book entries.
 
 ![Guestbook entries](images/lab1-guestbook-entries.png)
 
-Log into the pod:
+Next, inspect the data. To do this, run a bash process inside the application container using `kubectl exec`. Reference the pod name from the previous `kubectl get pods` command. Once inside the container, use the subsequent comands to inspect the data.
 
 ```
-kubectl exec -it guestbook-v1-6f55cb54c5-jb89d bash
-
-kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+kubectl exec -it [POD NAME] -- bash
 
 root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# ls -al
 total 256
@@ -246,7 +243,57 @@ tmpfs                    7.9G     0  7.9G   0% /sys/firmware
 
 ```
 
-Kill the pod to see the impact of deleting the pod on data.
+While still inside the container, create a file on the container file system. This file will not persist when we kill the container. Then run `/sbin/killall5` to terminate the container.
+
+```
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# touch dontdeletemeplease
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# ls dontdeletemeplease
+dontdeletemeplease
+root@guestbook-v1-66798779d6-fqh2j:/home/node/app# /sbin/killall5
+root@guestbook-v1-66798779d6-fqh2j:/home/node/app# command terminated with exit code 137
+```
+
+The `killall5` command will kick you out of the container (which is no longer running), but the pod is still running. Verify this with `kubectl get pods`. Not the **0/1** status indicating the application container is no longer running.
+```
+kubectl get pods
+NAME                            READY   STATUS             RESTARTS   AGE
+guestbook-v1-66798779d6-fqh2j   0/1     CrashLoopBackOff   2          16m
+```
+
+After a few seconds, the Pod will restart the container:
+```
+kubectl get pods
+NAME                            READY   STATUS    RESTARTS   AGE
+guestbook-v1-66798779d6-fqh2j   1/1     Running   3          16m
+```
+
+Run a bash process inside the container to inspect your data again:
+
+```
+kubectl exec -it [POD NAME] -- bash
+
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# cat data/cache.txt
+Hello Kubernetes!
+Hola Kubernetes!
+Zdravstvuyte Kubernetes!
+Nǐn hǎo Kubernetes!
+Goedendag Kubernetes!
+
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# cat logs/debug.txt
+Received message: Hello Kubernetes!
+Received message: Hola Kubernetes!
+Received message: Zdravstvuyte Kubernetes!
+Received message: Nǐn hǎo Kubernetes!
+Received message: Goedendag Kubernetes!
+
+
+root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# ls dontdeletemeplease
+ls: dontdeletemeplease: No such file or directory
+
+```
+Notice how the storage from the primary (`hostPath`) and secondary (`emptyDir`) storage types persisted beyond the lifecycle of the container, but the `dontdeletemeplease` file, did not.
+
+Next, we'll kill the pod to see the impact of deleting the pod on data.
 
 ```
 kubectl get pods
@@ -297,6 +344,13 @@ root@guestbook-v1-5cbc445dc9-sx58j:/home/node/app#
 
 This shows that the storage type `emptyDir` loose data on a pod restart whereas `hostPath` data lives until the worker node or cluster is deleted.
 
+| Storage Type  |  Persisted at which level | Example  Uses
+| - | - | - |
+| Container local storage | Container | ephermal state
+| Secondary Storage ([EmptyDir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)) | Pod | Checkpoint a long computation process
+| Primary Storage ([HostPath](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath)) | Node | Running cAdvisor in a container
+
+Normally Kubernetes clusters have multiple worker nodes in a cluster with replicas for a single application running across different worker nodes. In this case, only applications running on the same worker node will share data persisted with IKS Primary Storage (HostPath). More suitable solutions are available for cross worker nodes, cross availability-zone and cross-region storage.
 
 ## Clean up
 
