@@ -1,17 +1,18 @@
-# Lab 1. Non-pesistent storage with Kubernetes
+# Lab 1: Non-persistent storage with Kubernetes
 
 Storing data in containers or worker nodes are considered as the [non-persistent](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#local-ephemeral-storage) forms of data storage.
-In this lab, we will explore storage options on the IBM Kubernetes worker nodes. Follow this [lab](https://github.com/remkohdev/docker101/tree/master/workshop/lab-3) is you are interested in learning more about container based storage.
+In this lab, we will explore storage options on the IBM Kubernetes worker nodes. Follow this [lab](https://github.com/remkohdev/docker101/tree/master/workshop/lab-3) is you are interested in learning more about container-based storage.
 
 The lab covers the following topics:
-- Create and claim persistent volumes based on the [primary]() and secondary storage available on the worker nodes.
+- Create and claim IBM Kubernetes [non-persistent](https://cloud.ibm.com/docs/containers?topic=containers-storage_planning#non_persistent_overview) storage based on the primary and secondary storage available on the worker nodes.
 - Make the volumes available in the `Guestbook` application.
-- Use the volumes to stroage application cache and debug information.
+- Use the volumes to store application cache and debug information.
 - Access the data from the guestbook container using the Kubernetes CLI.
+- Assess the impact of losing a pod on data retention.
 - Claim back the storage resources and clean up.
 
 
-The primary storage maps to the volume type `hostPath` and the secondary storage maps to `emptyDir`. Learn more about Kubernetes volume types [here](https://kubernetes.io/docs/concepts/storage/volumes/).
+The primary storage maps to the volume type `hostPath` and the secondary storage maps to `emptyDir`. Learn more about Kubernetes volume types [here](https://Kubernetes.io/docs/concepts/storage/volumes/).
 
 ## Reserve Persistent Volumes
 
@@ -44,7 +45,7 @@ spec:
     path: "/mnt/data"
 ```
 
-Create the persistent volume as shown in the comamand below.
+Create the persistent volume as shown in the command below:
 ```
 kubectl create -f pv-hostpath.yaml
 persistentvolume/guestbook-primary-pv created
@@ -90,7 +91,7 @@ Change to the guestbook application source directory:
 ```
 cd $HOME/guestbook-nodejs/src
 ```
-Review the source `common/models/entry.js`. The application uses storage allocated using `hostPath` to store data cache in the file `data/cache.txt`. The file `logs/debug.txt` records debug messages and is provisioned via the `emptyDir` storage type.
+Review the source `common/models/entry.js`. The application uses storage allocated using `hostPath` to store data cache in the file `data/cache.txt`. The file `logs/debug.txt` records debug messages provisioned using the `emptyDir` storage type.
 
 ```source
 module.exports = function(Entry) {
@@ -98,7 +99,7 @@ module.exports = function(Entry) {
     Entry.greet = function(msg, cb) {
 
         // console.log("testing " + msg);
-        fs.appendFile('logs/debug.txt', "Recevied message: "+ msg +"\n", function (err) {
+        fs.appendFile('logs/debug.txt', "Received message: "+ msg +"\n", function (err) {
             if (err) throw err;
             console.log('Debug stagement printed');
         });
@@ -111,23 +112,23 @@ module.exports = function(Entry) {
 ...
 ```
 
-Run the commands listed below to build the guestbook image and copy into docker hub registry:
+Run the commands listed below to build the guestbook image and copy into the docker hub registry:
 
 ```
 cd $HOME/guestbook-nodejs/src
 docker build -t $DOCKERUSER/guestbook-nodejs:storage .
-export DOCKERUSER=rojanjose
-docker login -u DOCKERUSER
+docker login -u $DOCKERUSER
 docker push $DOCKERUSER/guestbook-nodejs:storage
 ```
 
 Review the deployment yaml file `guestbook-deplopyment.yaml` prior to deploying the application into the cluster.
 
 ```
-cd $HOME/storage/lab1
-cat guestbook-deplopyment.yaml
+cd $HOME/guestbook-config/storage/lab1
+cat guestbook-deployment.yaml
 ```
 
+Replace the first part of `image` name with your docker hub user id.
 The section `spec.volumes` lists `hostPath` and `emptyDir` volumes. The section `spec.containers.volumeMounts` lists the mount paths that the application uses to write in the volumes.
 
 ```
@@ -162,7 +163,7 @@ metadata:
 ...
 ```
 
-Deploy Guestbook application:
+Deploy the Guestbook application:
 
 ```
 kubectl create -f guestbook-deployment.yaml
@@ -223,11 +224,11 @@ Nǐn hǎo Kubernetes!
 Goedendag Kubernetes!
 
 root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# cat logs/debug.txt
-Recevied message: Hello Kubernetes!
-Recevied message: Hola Kubernetes!
-Recevied message: Zdravstvuyte Kubernetes!
-Recevied message: Nǐn hǎo Kubernetes!
-Recevied message: Goedendag Kubernetes!
+Received message: Hello Kubernetes!
+Received message: Hola Kubernetes!
+Received message: Zdravstvuyte Kubernetes!
+Received message: Nǐn hǎo Kubernetes!
+Received message: Goedendag Kubernetes!
 
 
 root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# df -h
@@ -287,14 +288,14 @@ Ciao Kubernetes!
 Sayonara Kubernetes!
 
 root@guestbook-v1-5cbc445dc9-sx58j:/home/node/app# cat logs/debug.txt
-Recevied message: Bye Kubernetes!
-Recevied message: Aloha Kubernetes!
-Recevied message: Ciao Kubernetes!
-Recevied message: Sayonara Kubernetes!
+Received message: Bye Kubernetes!
+Received message: Aloha Kubernetes!
+Received message: Ciao Kubernetes!
+Received message: Sayonara Kubernetes!
 root@guestbook-v1-5cbc445dc9-sx58j:/home/node/app#
 ```
 
-This shows that the storage type `emptyDir` loose data on a pod restart where as `hostPath` data lives until the worker node or cluster is deleted.
+This shows that the storage type `emptyDir` loose data on a pod restart whereas `hostPath` data lives until the worker node or cluster is deleted.
 
 
 ## Clean up
