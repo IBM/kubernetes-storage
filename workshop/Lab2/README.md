@@ -15,12 +15,12 @@ Following topics are covered in this exercise:
 Review the [storage classes](https://cloud.ibm.com/docs/containers?topic=containers-file_storage#file_storageclass_reference) for file storage. In addition to the standard set of storage classes, [custom storage classes](https://cloud.ibm.com/docs/containers?topic=containers-file_storage#file_custom_storageclass) can be defined to meet the storage requirements.
 
 ```bash
-kubectl get storageclasses | grep file
+kubectl get storageclasses
 ```
 
 Expected output:
 ```
-$ kubectl get storageclasses | grep file
+$ kubectl get storageclasses
 
 default                    ibm.io/ibmc-file   Delete          Immediate           false                  27m
 ibmc-file-bronze           ibm.io/ibmc-file   Delete          Immediate           false                  27m
@@ -36,7 +36,7 @@ ibmc-file-silver           ibm.io/ibmc-file   Delete          Immediate         
 ibmc-file-silver-gid       ibm.io/ibmc-file   Delete          Immediate           false                  27m
 ```
 
-This lab uses the storage class `ibm-file-silver`. Note that the default class is `ibmc-file-gold` is allocated if storgage class is not expliciity definded.
+IKS comes with storage class definitions for file storage. This lab uses the storage class `ibm-file-silver`. Note that the default class is `ibmc-file-gold` is allocated if storgage class is not expliciity definded.
 
 ```
 $ kubectl describe storageclass ibmc-file-silver
@@ -252,7 +252,7 @@ Note the Filesystem `fsf-dal1003d-fz.adn.networklayer.com:/IBM02SEV2058850_2177/
 Find the URL for the guestbook application by joining the worker node external IP and service node port.
 
 ```
-HOSTNAME=`ibmcloud ks workers --cluster $CLUSTERNAME | grep Ready | head -n 1 | awk '{print $2}'`
+HOSTNAME=`kubectl get nodes -ojsonpath='{.items[0].metadata.labels.ibm-cloud\.kubernetes\.io\/external-ip}'`
 SERVICEPORT=`kubectl get svc guestbook -o=jsonpath='{.spec.ports[0].nodePort}'`
 echo "http://$HOSTNAME:$SERVICEPORT"
 ```
