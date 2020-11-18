@@ -1,5 +1,9 @@
 # Lab 7. Connecting to External Storage
-This lab configures our nodejs guestbook Application to connect to an external database - outside of the kubernetes cluster in which the guestbook app is deployed. For this lab we will be using a managed database service offered on IBM Cloud. The advantages of using a database service is that scaling, security, etc are often taken care of for you, but you can apply this lab to any external database service such as a legacy database you might have running on premise.
+This lab configures our nodejs guestbook Application to connect to an external database - outside of the kubernetes cluster in which the guestbook app is deployed. We will be using a managed database service offered on IBM Cloud. The advantages of using a database service is that scaling, security, etc are often taken care of for you, but you can apply this lab to any external database service such as a legacy database you might have running on premise.
+
+Two options to setting up the database service
+- [Approach 1](#Approach-1:-Manually-create-database-service-on-IBM-Cloud-console)
+- [Approach 2](#-Approach-2:-Use-the-IBM-Cloud-Operator-to-provision-a-database-instance-on-IBM-Cloud)
 
 ## Approach 1: Manually create database service on IBM Cloud console
 
@@ -26,57 +30,95 @@ Expand the credential and take note of the **url** parameter. We will be using t
 
 ### Save your credentials in a Kubernetes `secret`
 
-TODO `kubectl create url secret`
+    ```
+    kubectl create secret generic cloudant-binding --from-literal=CLOUDANT_URL=[CLOUDANT_URL]
+    ```
 
 
 Once completed, [skip ahead to the next section](##Next-Steps)
 
-## Approach 2: Use the IBM Cloud Operator to provision and manage the database instance on IBM Cloud
+## Approach 2: Use the IBM Cloud Operator to provision a database instance on IBM Cloud
 
 The Operator Framework provides support for Kubernetes-native extensions to manage custom resource types through operators. Many operators are available through [operatorhub.io](https://operatorhub.io/), including the IBM Cloud operator. The IBM Cloud operator simplifies the creation of IBM Cloud services and resouces and binding credentials from these resources into a Kubernetes cluster. The instructions in this guide are adapted from the IBM Developer tutorial [Simplify the lifecycle management process for your Kubernetes apps with operators](https://developer.ibm.com/tutorials/simplify-lifecycle-management-kubernetes-openshift-ibm-cloud-operator/).
 
 With the IBM Cloud Kubernetes Service clusters at version 1.16 and later, the Operator Framework is already installed. So all you will need to do is install the IBM Cloud Operator. New clusters created after March 1st, 2020 should all be at this level (or later).
 
-### Installing the IBM Cloud operator
+### Create an API Key for your Target Account
 
-1. With the OLM framework and marketplace support installed, it's time to install the IBM Cloud operator. This operator will use an IBM Cloud API key to manage resources within the cluster. Begin to configure the IBM Cloud operator by logging in to the IBM Cloud account using the IBM Cloud CLI. Start by logging in to IBM Cloud
+We will configure the IBM Cloud Operator to maange resources on your personal IBM Cloud Account. You will be able to create and manage a Cloudant DB lite service that only you will have access to.
 
-    ```text
+1. Login to your personal IBM Cloud account. Use `--sso` if using single-sign-on. Select your personal account when asked upon logging in.
+
+    ```
     ibmcloud login
     ```
 
-1. Check your login default region to verify that there is a Cloud Foundry organization and space with this command:
+    ```
+    $ ibmcloud login
+    API endpoint: https://cloud.ibm.com
+    Region: us-south
+    Authenticating...
+    OK
 
-    ```text
-    ibmcloud account orgs
+    Select an account:
+    1. John H. Zaccone's Account (a21524842fc807640e69bf89c00009fc)
+    2. Another Account (12345)
+    Enter a number> 1
+    Targeted account John H. Zaccone's Account (a21524842fc807640e69bf89c00009fc)
+
+                        
+    API endpoint:      https://cloud.ibm.com   
+    Region:            us-south   
+    User:              John.Zaccone@ibm.com   
+    Account:           John H. Zaccone's Account (a21524842fc807640e69bf89c00009fc)   
+    Resource group:    No resource group targeted, use 'ibmcloud target -g RESOURCE_GROUP'   
+    CF API endpoint:      
+    Org:          
     ```
 
-    If there is output like:
+1. Create a service ID in IBM Cloud IAM. If possible, do not use spaces in the names for your IAM credentials. When you use the operator binding feature, any spaces are replaced with underscores.
 
-    ```text
-    Getting orgs in region 'us-south' as myemail@example.com ...
-    Retrieving current account...
-    No organizations were found.
+    ```
+    ibmcloud iam service-id-create serviceid-ico
     ```
 
-1. Verify that the ibmcloud CLI session is configured with a resource group for creation of the Tone Analyzer by the IBM Cloud operator. Run this command:
+1. Assign the service ID access to the required permissions to work with the IBM Cloud services. You will need the **Manager** role to provision a Cloudant service.
 
-    ```text
-    ibmcloud target
+    ```
+    ibmcloud iam service-policy-create serviceid-ico --roles Manager --resource-group-name default --region us-south
     ```
 
-    Check the output from the `ibmcloud target` command. If there is no resource group set, resulting in a message including:
+1. Create an API key for the service ID.
 
-    `Resource group:    No resource group targeted, use 'ibmcloud target -g RESOURCE_GROUP'`
-
-    then set the target resource group to the `Default` using:
-
-    ```text
-    ibmcloud target -g Default
+    ```
+    ibmcloud iam service-api-key-create apikey-ico serviceid-ico
     ```
 
-    > some older IBM Cloud accounts may have a resource group named `default`, if you see an error using `Default`, repeat the command with `default`.
+1. Set the API key of the service ID as your CLI environment variable. Now, when you run the installation script, the script uses the service ID's API key. The following command is an example for macOS.
 
+    ```
+    export IBMCLOUD_API_KEY=<apikey-ico-value>
+    ```
+
+1. Confirm that the API key environment variable is set in your CLI.
+
+    ```
+    echo $IBMCLOUD_API_KEY
+    ```
+
+### Installing the IBM Cloud operator
+
+1. Follow the setup steps in [Lab0](../Lab0/README.md) if necessary to point your `kubectl` command-line tool to your Kubernetes cluster.
+
+    ```shell
+    ibmcloud login
+    ```
+
+1. Target the default resource group that your service ID has privledges to.
+
+    ```text
+    ibmcloud target -g default
+    ```
 
 1. The operator marketplace catalog provides a URL for the resources to install for each operator. Install the IBM Cloud Operator with the following command:
 
@@ -87,7 +129,7 @@ With the IBM Cloud Kubernetes Service clusters at version 1.16 and later, the Op
     Check that the pod for the IBM Cloud operator is running with:
 
     ```text
-    kubectl get pods --namespace ibmcloud-operator-system
+    kubectl get pods --namespace ibm-system
     ```
 
     You should see after a minute or two that the pod for the operator is running:
@@ -102,14 +144,13 @@ With the IBM Cloud Kubernetes Service clusters at version 1.16 and later, the Op
 
 The [Operator Pattern](https://kubernetes.io/docs/concepts/extend-kubernetes/operator/) is an emerging approach to extend through automation the expertise of human operators into the cluster environment. Operators are intended to support applications and management of other resources in and related to kubernetes clusters starting at installation, but continuing to day 2 operations of monitoring, backup, fault recovery and, of course, updates.
 
-![Operator Pattern](../.gitbook/assets/operator-pattern.png)
-
 Operators are custom code that uses the Kubernetes API (as a client) to implement a controller for a [**Custom Resource**](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/). Unlike the controllers built into the Kubernetes control plane which run on the Kubernetes master node, operators run outside of the Kubernetes control plan as pods on the worker nodes in the cluster. You can verify that fact by the `kubectl get pods` command above, which lists the pods of the operator running on a worker node.
 
 In addition to the IBM Cloud Operator, there are many operators that can manage resources within your cluster available from the [Operator Hub](https://operatorhub.io). The Operator Hub includes many useful operators including operators that implement database installation, monitoring tools, application development frameworks, application runtimes and more.
 
 Your cluster now has the IBM Cloud operator installed. This operator is able to configure two custom resources in the cluster, a **Service** and a **Binding**. The **Service** defines a specific IBM Cloud service instance type to create, and the **Binding** specifies a named binding of a service instance to a secret in the cluster. For more details about the IBM Cloud operator see the [project repository](https://github.com/IBM/cloud-operators)
 
+<br>
 
 ### Creating an instance of Cloudant
 
