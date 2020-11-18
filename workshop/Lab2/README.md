@@ -67,23 +67,7 @@ File sliver has an IOPS of 4GB and a max capacity of 12TB.
 
 IBM Cloud File Storage provides fast access to your data for a cluster running in a single available zone. For higher availability, use a storage option that is designed for [geographically distributed data](https://cloud.ibm.com/docs/containers?topic=containers-storage_planning#persistent_storage_overview).
 
-To create a `PersistentVolumeClaim` we must first get the availability zone of our cluster. Run the following commands to find out which region and availablility zone the worker nodes of your cluster are running in:
-
-```
-ibmcloud ks clusters [CLUSTER NAME]
-ibmcloud ks workers -c [CLUSTER NAME]
-```
-
-Example output:
-```
-$ ibmcloud ks workers -c zaccone-guestbook2
-
-OK
-ID                                                       Public IP        Private IP     Flavor               State    Status   Zone    Version   
-kube-bun9o7vw0klq4okmgou0-zacconegues-default-0000010a   169.55.112.195   10.148.14.60   b3c.4x16.encrypted   normal   Ready    wdc04   1.18.10_1532 
-```
-
-Change the Review the yaml for the file storage `PersistentVolumeClaim`
+Review the yaml for the file storage `PersistentVolumeClaim`. When we create this `PersistentVolumeClaim`, it automatically creates it within an availability zone where the worker nodes are located.
 
 ```
 cd guestbook-config/storage/lab2
