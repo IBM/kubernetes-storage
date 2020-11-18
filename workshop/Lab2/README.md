@@ -1,6 +1,6 @@
 # Lab 2: File storage with Kubernetes
 
-This lab demonstrates the use of cloud based file storage with Kubernetes. It uses the IBM Cloud File Storage which is persistent, fast, and flexible network-attached, NFS-based File Storage capacit ranging  from 25 GB to 12,000 GB capacity with up to 48,000 IOPS. 
+This lab demonstrates the use of cloud based file storage with Kubernetes. It uses the IBM Cloud File Storage which is persistent, fast, and flexible network-attached, NFS-based File Storage capacity ranging from 25 GB to 12,000 GB capacity with up to 48,000 IOPS. The IBM Cloud File Storage provides data across all worker nodes within a single availability zone.
 
 Following topics are covered in this exercise:
 - Claim a classic file storage volume.
@@ -9,6 +9,9 @@ Following topics are covered in this exercise:
 - Use the `Guestbook` application to view the images.
 - Claim back the storage resources and clean up.
 
+## Prereqs
+
+Follow the [prereqs](../Lab0/README.md) if you haven't already.
 
 ## Claim file storage volume
 
@@ -39,6 +42,10 @@ ibmc-file-silver-gid       ibm.io/ibmc-file   Delete          Immediate         
 IKS comes with storage class definitions for file storage. This lab uses the storage class `ibm-file-silver`. Note that the default class is `ibmc-file-gold` is allocated if storgage class is not expliciity definded.
 
 ```
+kubectl describe storageclass ibmc-file-silver
+```
+Expected output:
+```
 $ kubectl describe storageclass ibmc-file-silver
 
 Name:            ibmc-file-silver
@@ -58,7 +65,25 @@ File sliver has an IOPS of 4GB and a max capacity of 12TB.
 
 ## Claim a file storage volume
 
-Review the yaml for the file storage `PersistentVolumeClaim`
+IBM Cloud File Storage provides fast access to your data for a cluster running in a single available zone. For higher availability, use a storage option that is designed for [geographically distributed data](https://cloud.ibm.com/docs/containers?topic=containers-storage_planning#persistent_storage_overview).
+
+To create a `PersistentVolumeClaim` we must first get the availability zone of our cluster. Run the following commands to find out which region and availablility zone the worker nodes of your cluster are running in:
+
+```
+ibmcloud ks clusters [CLUSTER NAME]
+ibmcloud ks workers -c [CLUSTER NAME]
+```
+
+Example output:
+```
+$ ibmcloud ks workers -c zaccone-guestbook2
+
+OK
+ID                                                       Public IP        Private IP     Flavor               State    Status   Zone    Version   
+kube-bun9o7vw0klq4okmgou0-zacconegues-default-0000010a   169.55.112.195   10.148.14.60   b3c.4x16.encrypted   normal   Ready    wdc04   1.18.10_1532 
+```
+
+Change the Review the yaml for the file storage `PersistentVolumeClaim`
 
 ```
 cd guestbook-config/storage/lab2
@@ -70,8 +95,6 @@ metadata:
  name: guestbook-pvc
  labels:
    billingType: hourly
-   region: us-south
-   zone: dal10
 spec:
  accessModes:
    - ReadWriteMany
@@ -91,7 +114,7 @@ $ kubectl create -f pvc-file-silver.yaml
 persistentvolumeclaim/guestbook-filesilver-pvc created
 ```
 
-Verify the PVC claim is created with the status `Bound`.
+Verify the PVC claim is created with the status `Bound`. This may take a minute or two.
 ```bash
 kubectl get pvc guestbook-filesilver-pvc
 ```
@@ -103,13 +126,13 @@ NAME                       STATUS   VOLUME                                     C
 guestbook-filesilver-pvc   Bound    pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9   20Gi       RWX            ibmc-file-silver   2m
 ```
 
-Details associated with the `pv`
+Details associated with the `pv`. Use the `pv` name from the previous command output.
 ```bash
-kubectl get pv pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9
+kubectl get pv [pv name]
 ```
 Expected output:
 ```
-$ kubectl get pv pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9
+$ kubectl get pv pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9 
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                              STORAGECLASS       REASON   AGE
 pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9   20Gi       RWX            Delete           Bound    default/guestbook-filesilver-pvc   ibmc-file-silver            90s
 ```
@@ -121,7 +144,7 @@ Change to the guestbook application source directory and review the html files `
 ```
 cd $HOME/guestbook-nodejs/src
 cat client/images.html
-cat client/inex.html
+cat client/index.html
 ```
 
 Run the commands listed below to build the guestbook image and copy into the docker hub registry:
@@ -175,6 +198,10 @@ kubectl create -f guestbook-service.yaml
 ```
 Verify the Guestbook application is runing.
 ```
+kubectl get all
+```
+Expected output:
+```
 $ kubectl get all
 NAME                                READY   STATUS    RESTARTS   AGE
 pod/guestbook-v1-5bd76b568f-cdhr5   1/1     Running   0          13s
@@ -199,17 +226,21 @@ NAME                            READY   STATUS    RESTARTS   AGE
 guestbook-v1-5bd76b568f-cdhr5   1/1     Running   0          78s
 guestbook-v1-5bd76b568f-w6h6h   1/1     Running   0          78s
 ```
-Log into any one of the pod.
+Set these variables for each of your pod names:
+```
+export POD1=[FIRST POD NAME]
+export POD2=[SECOND POD NAME]
+```
+Log into any one of the pod. Use one of the pod names from the previous command output.
 
 ```bash
-kubectl exec -it guestbook-v1-7fc4684cdb-t8l6w bash
+kubectl exec -it $POD1 -- bash
 ```
 
-Run the commands `ls -al; ls -al images; df -ah` to view the volume and files. Review the mount for the new volume. Note that the images folder is empty. 
+Run the commands `ls -al; ls -al images; df -ah` to view the volume and files. Review the mount for the new volume. Note that the images folder is empty.
 
-```
-$ kubectl exec -it guestbook-v1-5bd76b568f-cdhr5 bash
-kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
+```bash
+$ kubectl exec -it $POD1 -- bash
 root@guestbook-v1-5bd76b568f-cdhr5:/home/node/app# ls -alt
 total 252
 drwxr-xr-x   1 root root   4096 Nov 13 03:17 client
@@ -245,9 +276,11 @@ fsf-dal1003d-fz.adn.networklayer.com:/IBM02SEV2058850_2177/data01   20G     0   
 tmpfs                                                              7.9G     0  7.9G   0% /proc/acpi
 tmpfs                                                              7.9G     0  7.9G   0% /proc/scsi
 tmpfs                                                              7.9G     0  7.9G   0% /sys/firmware
+
+root@guestbook-v1-5bd76b568f-cdhr5:/home/node/app# exit
 ```
 
-Note the Filesystem `fsf-dal1003d-fz.adn.networklayer.com:/IBM02SEV2058850_2177/data01` is mounted on path `/home/node/app/client/images`.
+Note the filesystem `fsf-dal1003d-fz.adn.networklayer.com:/IBM02SEV2058850_2177/data01` is mounted on path `/home/node/app/client/images`.
 
 Find the URL for the guestbook application by joining the worker node external IP and service node port.
 
@@ -266,7 +299,7 @@ Verify that the images are missing by viewing the data from the Guestbook applic
 Run the `kubectl cp` command to move the images into the mounted volume.
 ```bash
 cd $HOME/guestbook-config/storage/lab2
-kubectl cp images guestbook-v1-5bd76b568f-cdhr5:/home/node/app/client/
+kubectl cp images $POD1:/home/node/app/client/
 ```
 
 Refresh the page `images.html` page in the guestbook application to view the uploaded images.
@@ -275,12 +308,10 @@ Refresh the page `images.html` page in the guestbook application to view the upl
 
 ## Shared storage across pods
 
-Login into the other pod `guestbook-v1-5bd76b568f-w6h6h` to verify the volume mount.
+Login into the other pod `$POD2` to verify the volume mount.
 
 ```
-kubectl exec -it guestbook-v1-5bd76b568f-w6h6h bash
-kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl kubectl exec [POD] -- [COMMAND] instead.
-
+kubectl exec -it $POD2 -- bash
 root@guestbook-v1-5bd76b568f-w6h6h:/home/node/app# ls -alt /home/node/app/client/images
 total 160
 -rw-r--r-- 1    501 staff      56191 Nov 13 03:44 gb3.jpg
@@ -301,18 +332,57 @@ fsf-dal1003d-fz.adn.networklayer.com:/IBM02SEV2058850_2177/data01   20G  128K   
 tmpfs                                                              7.9G     0  7.9G   0% /proc/acpi
 tmpfs                                                              7.9G     0  7.9G   0% /proc/scsi
 tmpfs                                                              7.9G     0  7.9G   0% /sys/firmware
+
+root@guestbook-v1-5bd76b568f-w6h6h:/home/node/app# exit
 ```
 
 Note that the volume and the data are available on all the pods running the Guestbook application.
 
+IBM Cloud File Storage is a NFS-based file storage that is available across all worker nodes within a single availability zone. If you are running a cluster with multiple nodes (within a single AZ) you can run the following commands to prove that your data is available across different nodes:
+
+```
+kubectl get pods -o wide
+kubectl get nodes
+```
+Expected output:
+```
+$ kubectl get pods -o wide
+NAME                            READY   STATUS    RESTARTS   AGE   IP               NODE            NOMINATED NODE   READINESS GATES
+guestbook-v1-6fb8b86876-n9jtz   1/1     Running   0          39h   172.30.224.70    10.38.216.205   <none>           <none>
+guestbook-v1-6fb8b86876-njwcz   1/1     Running   0          39h   172.30.169.144   10.38.216.238   <none>           <none>
+
+$ kubectl get nodes
+NAME            STATUS   ROLES    AGE    VERSION
+10.38.216.205   Ready    <none>   4d5h   v1.18.10+IKS
+10.38.216.238   Ready    <none>   4d5h   v1.18.10+IKS
+```
+
+To extend our table from Lab 1 we now have:
+| Storage Type  |  Persisted at which level | Example  Uses
+| - | - | - |
+| Container local storage | Container | ephermal state
+| Secondary Storage ([EmptyDir](https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)) | Pod | Checkpoint a long computation process
+| Primary Storage ([HostPath](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath)) | Node | Running cAdvisor in a container
+| IBM Cloud File Storage (NFS) | Availabilty Zone | Applications running in a single availabilty zone
+
+<br>
+Data is available to all nodes within the availability zone where the file storage exists, but the `accessMode` parameter on the `PersistentVolumeClaim` determines if multiple pods are able to mount a volume specificed by a PVC. The possible values for this parameter are:
+
+- **ReadWriteMany**: The PVC can be mounted by multiple pods. All pods can read from and write to the volume.
+- **ReadOnlyMany**: The PVC can be mounted by multiple pods. All pods have read-only access.
+- **ReadWriteOnce**: The PVC can be mounted by one pod only. This pod can read from and write to the volume.
+
 
 ## [Optional exercises]
 
-Back up data.
-Delete pods to confirm that it does not impact the data used by the application.
-Delete the Kubernetes cluster.
-Create a new cluster and reuse the volume.
+Another way to see that the data is persisted at the availability zone level, you can:
 
+- Back up data.
+- Delete pods to confirm that it does not impact the data used by the application.
+- Delete the Kubernetes cluster.
+- Create a new cluster and reuse the volume.
+
+##
 ## Clean up
 
 List all the PVCs and PVs
