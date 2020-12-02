@@ -1,5 +1,7 @@
 # Setup Object Storage
 
+In this section, you will create an instance of IBM Cloud Object Storage (COS), create credentials and a bucket. 
+
 Steps:
 * Preparation
 * Create an Object Storage Instance
