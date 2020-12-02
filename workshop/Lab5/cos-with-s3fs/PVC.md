@@ -25,6 +25,7 @@ In this exercise, you are going to use an existing bucket when assigning persist
 1. You need the bucket name and namespace to configure the PVC,
 
     ```
+    echo "https://$COS_PRIVATE_ENDPOINT"
     echo $COS_BUCKET_NAME
     oc project
     ```
