@@ -18,6 +18,11 @@ s3fs on macOS uses [`osxfuse`](https://osxfuse.github.io/). osxfuse is FUSE for 
 
 In this lab, you will [mount a bucket using s3fs](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-s3fs). You need admin access to install `s3fs-fuse`. In this lab, I used `brew` on macOS, for other Operating Systems, see the [installation instructions](https://github.com/s3fs-fuse/s3fs-fuse).
 
+Pre-requirements:
+* A free IBM Cloud account,
+* A free IBM Cloud Object Storage (COS) instance with a bucket,
+* Admin access to your client OS,
+
 ### Connect to IBM Cloud
 
 You have to be logged in to your IBM Cloud account,
