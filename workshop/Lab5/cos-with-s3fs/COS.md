@@ -1,4 +1,4 @@
-# Create an Instance of Object Storage
+# Setup Object Storage
 
 Steps:
 * Preparation
