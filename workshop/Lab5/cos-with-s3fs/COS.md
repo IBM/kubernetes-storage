@@ -227,7 +227,7 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
 
 ## Get Private Endpoint
 
-The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object Storage instance to mount the bucket. The correct endpoint can be found using the region in which your Object Storage is located.
+The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object Storage instance to mount the bucket. The correct endpoint can be found using the region in which your Object Storage bucket is located.
 
 1. To list your bucket's location use
 
@@ -260,7 +260,7 @@ The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object 
     ibmcloud cos config endpoint-url --list
     ```
 
-    If the `ServiceEndpointURL` is empty as int he example below, you can find the service endpoint manually.
+    If the `ServiceEndpointURL` is empty as in the example below, you can find the service endpoint manually.
 
     ```
     $ ibmcloud cos config endpoint-url --list

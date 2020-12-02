@@ -1,4 +1,4 @@
-# Install IBM Cloud Object Storage Plugin
+# Setup the IBM Cloud Object Storage Plugin
 
 You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, using the Helm CLI tool in this section.
 
