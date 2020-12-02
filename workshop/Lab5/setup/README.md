@@ -112,4 +112,4 @@ should output the directory `/home/project/cos-with-s3fs`.
 
 ## Next
 
-[Object Storage](../cos-with-s3fs/COS.md)
+[Setup Object Storage](../cos-with-s3fs/COS.md)
