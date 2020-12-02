@@ -71,7 +71,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
 4. In the Theia editor, click `File` > `Open`, and browse to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` directory and open the file `provisioner-sa.yaml`.
 
-    ![Theia - Open dir](images/cos-with-s3fs/theia-open-dir.png)
+    ![Theia - Open dir](../images/cos-with-s3fs/theia-open-dir.png)
 
 5. Search for content `ibmcloud-object-storage-secret-reader` in the file around line 62.
 
