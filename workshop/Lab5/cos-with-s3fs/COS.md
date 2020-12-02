@@ -1,6 +1,6 @@
 # Setup Object Storage
 
-In this section, you will create an instance of IBM Cloud Object Storage (COS), create credentials and a bucket. 
+In this section, you will create an instance of IBM Cloud Object Storage (COS), create credentials and a bucket to store your persistent data for MongoDB.
 
 Steps:
 * Preparation
