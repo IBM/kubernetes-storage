@@ -32,8 +32,8 @@ In this exercise, you are going to use an existing bucket when assigning persist
 
 1. Create the file,
 
-```
-$ echo 'kind: PersistentVolumeClaim
+    ```
+echo 'kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
     name: my-iks-pvc
@@ -51,7 +51,8 @@ spec:
         requests:
             storage: 8Gi
     storageClassName: ibmc-s3fs-standard-regional' > my-iks-pvc.yaml
-```
+    ```
+
     **Note**: indentation in YAML is important. If the PVC status remains `Pending`, the two usual suspects will be the `secret` with its credentials and the indentation in the YAML of the PVC.
 
 1. In `Theia` the integrated browser IDE, in the directory `/project/cos-with-s3fs`, open the file `my-iks-pvc.yaml`, and set the right values if changes are still needed, 
