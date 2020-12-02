@@ -55,13 +55,17 @@ spec:
 
 **Note**: indentation in YAML is important. If the PVC status remains `Pending`, the two usual suspects will be the `secret` with its credentials and the indentation in the YAML of the PVC.
 
-1. In `Theia` the integrated browser IDE, in the directory `/project/cos-with-s3fs`, open the file `my-iks-pvc.yaml`, and set the right values if changes are still needed, 
+1. In `Theia` the integrated browser IDE, in the directory `/project/cos-with-s3fs`, open the file `my-iks-pvc.yaml`, 
+
+    ![](../images/cos-with-s3fs/theia-open-my-pvc.png)
+
+and set the right values if changes are still needed, 
     
     * the `ibm.io/bucket` should be set to the value defined in `echo $COS_BUCKET_NAME`,
     * change the namespace value to the project name found with `oc project`,
     * validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage instance,
 
-2. Create a `PersistentVolumeClaim`.
+1. Create a `PersistentVolumeClaim`.
 
     ```
     oc apply -f my-iks-pvc.yaml
@@ -75,7 +79,7 @@ spec:
     persistentvolumeclaim/my-iks-pvc created
     ```
 
-3. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
+2. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
 
     ```
     oc get pvc
@@ -94,7 +98,7 @@ spec:
 
     > Note: If the state of the PVC stays as `Pending`, the problem must be resolved before you move to the next step.
 
-4. Verify a new `PersistentVolume` was also created successfully.
+3. Verify a new `PersistentVolume` was also created successfully.
 
     ```
     oc get pv
