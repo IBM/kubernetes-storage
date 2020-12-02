@@ -303,3 +303,5 @@ To verify MongoDB deployment,
 ## Conclusion
 
 You are awesome! You have now added IBM Cloud Object Storage persistent storage to your MongoDB database using dynamic provisioning the `IBM Cloud Object Storage plugin` based on `s3fs-fuse`. What remains is configuring your application to use the MongoDB service.
+
+You can use the instructions in the [FUSE lab](../../fuse/README.md) to mount a local filesystem to the remote Object Storage and inspect the documents.
