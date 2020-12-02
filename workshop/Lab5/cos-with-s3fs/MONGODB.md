@@ -298,4 +298,8 @@ To verify MongoDB deployment,
 
 12. If you review the bucket in your Object Storage, MongoDB should now be writing its data files to the object storage.
 
-    ![COS data files](../.gitbook/images/ibmcloud-cos-bucket-datafiles.png)
+    ![COS data files](../images/cos-with-s3fs/ibmcloud-cos-bucket-datafiles.png)
+
+## Conclusion
+
+You are awesome! You have now added IBM Cloud Object Storage persistent storage to your MongoDB database using dynamic provisioning the `IBM Cloud Object Storage plugin` based on `s3fs-fuse`. What remains is configuring your application to use the MongoDB service.
