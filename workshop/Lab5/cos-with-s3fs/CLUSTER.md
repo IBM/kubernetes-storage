@@ -54,13 +54,23 @@ You now have an Object Storage instance with a bucket, and have found the corres
     echo $CLUSTER_NAME
     ```
 
-5.  **In your browser** get login command for your cluster: 
+5.  **In your browser:** get the login command for your cluster: 
     1.  Go to the IBM Cloud resources page at https://cloud.ibm.com/resources,
     Under `Clusters` find and select your cluster, and load the cluster overview page. There are two ways to retrieve the login command with token:
     1. Click the `Actions` drop down next to the `OpenShift web console` button, and select `Connect via CLI`, in the pop-up window, click the `oauth token request page` link, or
     2. Click `OpenShift web console` button, in the `OpenShift web console`, click your profile name, such as IAM#name@email.com, and then click `Copy Login Command`. 
 
-    In the new page that opens for both options, click `Display Token`, copy the `oc login` command, and paste the command into your terminal.
+    ![Copy Login Command](../images/cluster/ocp_copylogincommand.png)
+
+    In the new page that opens for both options, click `Display Token`, 
+    
+    ![Display Token](../images/cluster/ocp_displaytoken.png)
+    
+    Copy the `oc login` command, 
+    
+    ![Copy oc login](../images/cluster/ocp_copy_oclogin.png)
+    
+    and paste the command into your terminal.
 
     ```
     $ oc login --token=HjXc6nNGyCB1imhqtc9csTmGQ5obrPcoe4SRJqTnnT8 --server=https://c100-e.us-south.containers.cloud.ibm.com:30712
