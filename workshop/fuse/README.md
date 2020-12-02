@@ -28,6 +28,16 @@ ibmcloud login -u <IBMId>
 
 If you are using Single Sign-On (SSO) use the `-sso` flag to log in.
 
+Select the account with your instance of Object Storage. In the example below, I have to select account **1** under my own name, e.g. `B Newell's Account',
+
+```
+Select an account:
+    1. B Newell's Account (31296e3a285f)
+    2. IBM Client Developer Advocacy (e65910fa61) <-> 1234567
+    Enter a number> **1**
+    Targeted account B Newell's Account (31296e3a285f)
+```
+
 Then, set an environment variable with the bucket name, and upload a document to your bucket in the IBM Cloud Object Storage instance. 
 
 ```
