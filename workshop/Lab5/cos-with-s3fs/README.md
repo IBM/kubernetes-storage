@@ -10,13 +10,15 @@ This hands-on lab for object storage on Kubernetes is called `Add Object Storage
 
 ![](../images/cos-plugin-architecture.png)
 
-This main lab consists of the following steps:
+The lab consists of the following steps:
 1. Setup client CLI and Kubernetes cluster, Go to [Setup](../setup/README.md),
 2. Create an Object Storage instance, go to [Object Storage](COS.md),
 3. Configure the Kubernetes cluster, go to [Configure your Kubernetes Cluster](CLUSTER.md)
 4. Deploy and configure the `IBM Cloud Object Storage plugin`, go to [Cloud Object Storage plugin](COS-PLUGIN.md),
 5. Create a `PersistentVolumeClaim` with dynamic provisioning using the `ibmc` plugin, go to [Create the PersistentVolumeClaim](PVC.md).
 6. Install MongoDB with Object Storage, go to [MongoDB](MONGODB.md).
+
+Start with [Setup](../setup/README.md).
 
 ## Other Labs
 
