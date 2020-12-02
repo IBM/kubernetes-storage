@@ -61,26 +61,26 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
     ```
 
 1. Before using the `IBM Cloud Object Storage Plugin`, configuration changes are required.
-1. In the `Cloud Shell` where you downloaded the IBM Cloud Object Storage plugin, navigate to the templates folder of the `IBM Cloud Object Storage Plugin` installation.
+2. In the `Cloud Shell` where you downloaded the IBM Cloud Object Storage plugin, navigate to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` folder of the `IBM Cloud Object Storage Plugin` installation.
 
     ```
     ls -al ibm-object-storage-plugin/templates
     ```
 
-1. Make sure the `provisioner-sa.yaml` file is present and configure it to access the COS service using the COS service credentials secret `cos-write-access` that you created in the previous section.
+3. Make sure the `provisioner-sa.yaml` file is present and configure it to access the COS service using the COS service credentials secret `cos-write-access` that you created in the previous section.
 
-1. In the Theia editor, click `File` > `Open`, and browse to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` directory and open the file `provisioner-sa.yaml`.
+4. In the Theia editor, click `File` > `Open`, and browse to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` directory and open the file `provisioner-sa.yaml`.
 
-    ![Theia - Open dir](../.gitbook/images/cos-with-s3fs/theia-open-dir.png)
+    ![Theia - Open dir](images/cos-with-s3fs/theia-open-dir.png)
 
-1. Search for content `ibmcloud-object-storage-secret-reader` in the file around line 62.
+5. Search for content `ibmcloud-object-storage-secret-reader` in the file around line 62.
 
     **in a `vi` editor**,
     - Type colon `:`
     - Type `/ibmcloud-object-storage-secret-reader`
     - Press `<ENTER>` key
 
-1. Scroll a few lines down to line #72 and find the section that is commented out `#resourceNames: [""]`.
+6. Scroll a few lines down to line #72 and find the section that is commented out `#resourceNames: [""]`.
 
     ``` 
     rules:
@@ -89,7 +89,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
         #resourceNames: [""]
     ```
 
-1. Uncomment the line and change the section to set the secret to `cos-write-access` and allow access to the COS instance,
+7. Uncomment the line and change the section to set the secret to `cos-write-access` and allow access to the COS instance,
 
     ```
     rules:
@@ -98,9 +98,9 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
         resourceNames: ["cos-write-access"]
     ```
 
-1. Save the change and close the file.
+8. Save the change and close the file.
 
-1. Install the configured storage classes for `IBM Cloud Object Storage`, which will use the edited template file.
+9. Install the configured storage classes for `IBM Cloud Object Storage`, which will use the edited template file.
 
     ```
     helm ibmc install ibm-object-storage-plugin ./ibm-object-storage-plugin
@@ -127,7 +127,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
     <and a whole lot more instructions>
     ```
 
-1. Verify that the storage classes are created successfully.
+10. Verify that the storage classes are created successfully.
 
     ```
     oc get storageclass | grep 'ibmc-s3fs'
@@ -152,7 +152,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
     ibmc-s3fs-vault-regional    ibm.io/ibmc-s3fs   19s
     ```
 
-1. Review the storage class `ibmc-s3fs-standard-regional`.
+11. Review the storage class `ibmc-s3fs-standard-regional`.
 
     ```
     oc describe storageclass ibmc-s3fs-standard-regional
@@ -177,7 +177,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
     Additional information is available at https://cloud.ibm.com/docs/containers?topic=containers-object_storage#configure_cos.
 
-1. Verify that plugin pods are in "Running" state and indicate `READY` state of `1/1`:
+12. Verify that plugin pods are in "Running" state and indicate `READY` state of `1/1`:
 
     ```
     oc get pods -n kube-system -o wide | grep object
