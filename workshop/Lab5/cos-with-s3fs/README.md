@@ -2,7 +2,7 @@
 
 ## About this Lab
 
-The hands-on lab for object storage on Kubernetes is called `Add Object Storage to a Persistent Database` and steps you through the setup and configuration of persistent storage for MongoDB using IBM Cloud Object Storage. This lab uses the [IBM Cloud Object Storage plugin](https://github.com/IBM/ibmcloud-object-storage-plugin) to connect the Object Storage to the Kubernetes cluster via `PersistentVolume` via `dynamic provisioning`. A MongoDB database is setup that persists its data to an encrypted `IBM Cloud Object Storage` bucket using a `PersistentVolumeClaim`. 
+This hands-on lab for object storage on Kubernetes is called `Add Object Storage to a Persistent Database` and steps you through the setup and configuration of persistent storage for MongoDB using IBM Cloud Object Storage. This lab uses the [IBM Cloud Object Storage plugin](https://github.com/IBM/ibmcloud-object-storage-plugin) to mount an Object Storage bucket to a Kubernetes cluster using `PersistentVolume` by `dynamic provisioning`. A MongoDB database is setup that persists its data to the encrypted `IBM Cloud Object Storage` bucket using a `PersistentVolumeClaim`. 
 
 `IBM Cloud Object Storage plugin` is a Kubernetes volume plugin that enables Kubernetes pods to access `IBM Cloud Object Storage` buckets. The plugin has two components: a dynamic provisioner and a FlexVolume driver for mounting the buckets using `s3fs-fuse` on a worker node.
 
