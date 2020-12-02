@@ -22,12 +22,6 @@ Steps:
     COS_ENDPOINT=s3.private.$REGION.cloud-object-storage.appdomain.cloud
     ```
 
-    and edit your IBM ID,
-
-    ```
-    IBM_ID=<your ibm id>
-    ```
-
 2. Create an instance of the `IBM Cloud Object Storage` service. For information, go to https://cloud.ibm.com/catalog/services/cloud-object-storage. You can only have 1 single free Lite instance per account. Login to your **personal account**,
 
     ```
@@ -296,4 +290,6 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
 
    5.  Take note of the `Private` endpoint. It should match your environment variable $COS_ENDPOINT
 
-Continue to [Setup your Cluster](README.md).
+## Next
+
+[Configure your Kubernetes Cluster](CLUSTER.md)

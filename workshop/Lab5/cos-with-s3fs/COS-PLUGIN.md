@@ -198,3 +198,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
     The installation is successful when one `ibmcloud-object-storage-plugin` pod and one or more `ibmcloud-object-storage-driver` pods are in `running` state.
 
     The number of `ibmcloud-object-storage-driver` pods equals the number of worker nodes in your cluster. All pods must be in a `Running` state for the plug-in to function properly. If the pods fail, run `kubectl describe pod -n kube-system <pod_name>` to find the root cause for the failure.
+
+## Next
+
+[Create the PersistentVolumeClaim](PVC.md)

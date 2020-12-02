@@ -1,4 +1,4 @@
-# IBM Cloud Object Storage Plug-in
+# IBM Cloud Object Storage plugin
 
 [IBM Cloud Object Storage plug-in](https://github.com/IBM/ibmcloud-object-storage-plugin/blob/master/README.md) is a Kubernetes Volume plug-in that enables Kubernetes pods to access IBM Cloud Object Storage buckets. The plug-in has two components: a dynamic provisioner and a FlexVolume driver for mounting the buckets using `s3fs-fuse` on a worker node. You can read more about Filesystems for User Spaces (FUSE) and `s3fs-fuse` in the [s3fs-fuse lab](../fuse/README.md).
 
@@ -33,3 +33,6 @@ s3fs allows Linux and macOS to mount an S3 bucket via FUSE. With the s3fs mountp
 
 s3fs can yield good performance results when used with workloads reading or writing relatively large files (say, 20MB+) sequentially. On the other hand, you probably do not want to use s3fs with workloads accessing a database (as file locking is not supported), or workloads requiring random read or write access to files (because of the one-to-one file to object mapping). s3fs is not suitable for accessing data that is being mutated (other than by the s3fs instance itself).
 
+## Next
+
+[Lab 5: Add Object Storage to a Persistent Database](README.md)

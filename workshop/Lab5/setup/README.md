@@ -6,6 +6,8 @@ This section is broken up into the following steps:
   - [1. Sign up for IBM Cloud](#1-sign-up-for-ibm-cloud)
   - [2. Setup Client CLI](#2-setup-client-cli)
   - [3. Access to an OpenShift Cluster](#3-access-to-an-openshift-cluster)
+  - [4. Environment Variables](#4-environment-variables)
+  - [Next](#next)
 
 ## 1. Sign up for IBM Cloud
 
@@ -87,4 +89,27 @@ If you have an IBM Cloud account already, you can skip this step and login to yo
 
 ## 3. Access to an OpenShift Cluster
 
-TBD
+
+## 4. Environment Variables
+
+Create an environment variable for your IBM ID,
+
+    ```
+    IBM_ID=<your ibm id>
+    ```
+
+If completed, in your [terminal](https://labs.cognitiveclass.ai/), create a working directory named `cos-with-s3fs` to start the lab,
+
+    ```
+    NAMESPACE=cos-with-s3fs
+    mkdir $NAMESPACE
+    cd $NAMESPACE
+    export WORKDIR=$(pwd)
+    echo $WORKDIR
+    ```
+
+    should output the directory `/home/project/cos-with-s3fs`.
+
+## Next
+
+[Object Storage](../cos-with-s3fs/COS.md)
