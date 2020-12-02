@@ -32,7 +32,7 @@ In this exercise, you are going to use an existing bucket when assigning persist
 
 1. Create the file,
 
-    ```
+```
 echo 'kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -51,7 +51,7 @@ spec:
         requests:
             storage: 8Gi
     storageClassName: ibmc-s3fs-standard-regional' > my-iks-pvc.yaml
-    ```
+```
 
     **Note**: indentation in YAML is important. If the PVC status remains `Pending`, the two usual suspects will be the `secret` with its credentials and the indentation in the YAML of the PVC.
 
@@ -61,7 +61,7 @@ spec:
     * change the namespace value to the project name found with `oc project`,
     * validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage instance,
 
-1. Create a `PersistentVolumeClaim`.
+2. Create a `PersistentVolumeClaim`.
 
     ```
     oc apply -f my-iks-pvc.yaml
@@ -75,7 +75,7 @@ spec:
     persistentvolumeclaim/my-iks-pvc created
     ```
 
-1. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
+3. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
 
     ```
     oc get pvc
@@ -94,7 +94,7 @@ spec:
 
     > Note: If the state of the PVC stays as `Pending`, the problem must be resolved before you move to the next step.
 
-1. Verify a new `PersistentVolume` was also created successfully.
+4. Verify a new `PersistentVolume` was also created successfully.
 
     ```
     oc get pv
