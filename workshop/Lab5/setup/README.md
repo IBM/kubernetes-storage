@@ -94,21 +94,21 @@ If you have an IBM Cloud account already, you can skip this step and login to yo
 
 Create an environment variable for your IBM ID,
 
-    ```
-    IBM_ID=<your ibm id>
-    ```
+```
+IBM_ID=<your ibm id>
+```
 
 If completed, in your [terminal](https://labs.cognitiveclass.ai/), create a working directory named `cos-with-s3fs` to start the lab,
 
-    ```
-    NAMESPACE=cos-with-s3fs
-    mkdir $NAMESPACE
-    cd $NAMESPACE
-    export WORKDIR=$(pwd)
-    echo $WORKDIR
-    ```
+```
+NAMESPACE=cos-with-s3fs
+mkdir $NAMESPACE
+cd $NAMESPACE
+export WORKDIR=$(pwd)
+echo $WORKDIR
+```
 
-    should output the directory `/home/project/cos-with-s3fs`.
+should output the directory `/home/project/cos-with-s3fs`.
 
 ## Next
 
