@@ -41,6 +41,7 @@ Select an account:
 Then, set an environment variable with the bucket name, and upload a document to your bucket in the IBM Cloud Object Storage instance. 
 
 ```
+COS_NAME=<cos-instance-name>
 COS_BUCKET_NAME=<cos-bucket-name>
 ```
 
@@ -69,7 +70,19 @@ Install `s3fs`,
 brew install s3fs
 ```
 
-Create an IBM Cloud Object Storage instance with HMAC keys,
+If you already have credentials with HMAC keys created for your Object Storage instance, you can retrieve credentials using,
+
+```
+ibmcloud resource service-keys --output json
+```
+
+Set an environment variable `COS_CREDENTIALS` with the name of the credentials,
+
+```
+COS_CREDENTIALS=$(ibmcloud resource service-keys --output json | jq -r '.[0].credentials.iam_apikey_name')
+```
+
+If you do not have credentials yet, create credentials for your IBM Cloud Object Storage instance with HMAC keys,
 
 ```
 ibmcloud resource service-key-create $COS_CREDENTIALS Writer --instance-name $COS_NAME --parameters '{"HMAC":true}'
@@ -84,7 +97,7 @@ Will create credentials including among other HMAC keys,
 },
 ```
 
-Create environment variables with the HMAC keys, and create an S3FS password file,
+Create environment variables with the HMAC keys from the first credentials listed in your `service-keys` list. Change the index value if you have multiple `service-keys` or credentials. Create an S3FS password file,
 
 ```
 COS_ACCESS_KEY=$(ibmcloud resource service-key $COS_CREDENTIALS --output json | jq -r '.[0].credentials.cos_hmac_keys.access_key_id')
@@ -109,12 +122,14 @@ s3fs $COS_BUCKET_NAME -o passwd_file=$(pwd)/$COS_S3FS_PASSWORD_FILE -o url=https
 
 You should see the content of your IBM Cloud Object Storage, e.g using the Finder on macos
 
-![S3FS mounted IBM Cloud Object Storage bucket](../.gitbook/images/s3fs/s3fs-mount-cos-bucket.png)
+![S3FS mounted IBM Cloud Object Storage bucket](images/s3fs/s3fs-mount-cos-bucket.png)
 
 or using the cli on macos,
 
-![S3FS mounted IBM Cloud Object Storage bucket CLI](../.gitbook/images/s3fs/s3fs-mount-cos-bucket-cli.png)
+![S3FS mounted IBM Cloud Object Storage bucket CLI](images/s3fs/s3fs-mount-cos-bucket-cli.png)
+
+If you are using a bucket mounted to a MongoDB instance using `s3fs-fuse`, you will also see a directory `data/db` with all the MongoDB database files mounted to your local filesystem.
 
 ### References
 
-* https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-s3fs
+* [Mounting a bucket using s3fs](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-s3fs)
