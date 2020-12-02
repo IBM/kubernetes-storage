@@ -12,7 +12,7 @@ The introductory page of the workshop is broken down into the following sections
 * Lab 2 File storage with kubernetes.
 * Lab 3: Block storage with kubernetes.
 * Lab 4: Kubernetes StatefulSets.
-* Lab 5: Object Storage with Kubernetes.
+* [Lab 5: Object Storage with Kubernetes](Lab5/README.md).
 
 
 ## Technology Used
