@@ -85,8 +85,8 @@ In this section, you are going to deploy an instance of MongoDB to your OpenShif
     Using the fsGroup and user ids, create two environment variables,
 
     ```
-    export SA_SCC_FSGROUP=1000660000
-    export SA_SCC_RUNASUSER=1000660000
+    export SA_SCC_FSGROUP=<value of sa.scc.supplemental-groups>
+    export SA_SCC_RUNASUSER=<value of sa.scc.uid-range>
     ```
 
     to deploy the bitnami Helm chart,
