@@ -196,6 +196,12 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
     ibmcloud cos config crn --crn $COS_CRN
     ```
 
+    Check the config again, to make sure the CRN is set now,
+
+    ```
+    $ ibmcloud cos config list
+    ```
+
 2. Create a new bucket.
 
     ```
