@@ -119,4 +119,4 @@ You're now ready to persist data on the IBM Cloud Object Storage within your con
 
 ## Next
 
-[MongoDB](MONGODB.md)
+[Setup MongoDB](MONGODB.md)
