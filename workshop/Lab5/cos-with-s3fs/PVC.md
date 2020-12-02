@@ -61,9 +61,10 @@ spec:
 
 and set the right values if changes are still needed, 
     
+    * change the `namespace` value to the project name found with `oc project`,
     * the `ibm.io/bucket` should be set to the value defined in `echo $COS_BUCKET_NAME`,
-    * change the namespace value to the project name found with `oc project`,
-    * validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage instance,
+    * `ibm.io/secret-name` should be set to `"cos-write-access"`,
+    * validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage bucket for the correct region,
 
 1. Create a `PersistentVolumeClaim`.
 
