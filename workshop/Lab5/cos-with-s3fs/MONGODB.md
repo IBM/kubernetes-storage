@@ -74,12 +74,25 @@ In this section, you are going to deploy an instance of MongoDB to your OpenShif
     ...
     ```
 
-    Which defines that the `sa.scc.supplemental-groups` allowed are `1000630000/10000`, the `sa.scc.uid-range` for the project is `1000630000/10000` in format M/N, where M is the starting ID and N is the count.
-
-    Using the fsGroup and user ids, deploy the bitnami Helm chart, e.g.
+    or 
 
     ```
-    helm install mongodb bitnami/mongodb --set persistence.enabled=true --set persistence.existingClaim=my-iks-pvc --set livenessProbe.initialDelaySeconds=180 --set auth.rootPassword=passw0rd --set auth.username=user1 --set auth.password=passw0rd --set auth.database=mydb --set service.type=ClusterIP --set podSecurityContext.enabled=true,podSecurityContext.fsGroup=1000630000,containerSecurityContext.enabled=true,containerSecurityContext.runAsUser=1000630000
+    oc get project $NAMESPACE -o yaml | grep 'sa.scc.'
+    ```
+
+    Which defines that the `sa.scc.supplemental-groups` allowed are `1000630000/10000`, the `sa.scc.uid-range` for the project is `1000630000/10000` in format M/N, where M is the starting ID and N is the count.
+
+    Using the fsGroup and user ids, create two environment variables,
+
+    ```
+    export SA_SCC_FSGROUP=1000660000
+    export SA_SCC_RUNASUSER=1000660000
+    ```
+
+    to deploy the bitnami Helm chart,
+
+    ```
+    helm install mongodb bitnami/mongodb --set persistence.enabled=true --set persistence.existingClaim=my-iks-pvc --set livenessProbe.initialDelaySeconds=180 --set auth.rootPassword=passw0rd --set auth.username=user1 --set auth.password=passw0rd --set auth.database=mydb --set service.type=ClusterIP --set podSecurityContext.enabled=true,podSecurityContext.fsGroup=$SA_SCC_FSGROUP,containerSecurityContext.enabled=true,containerSecurityContext.runAsUser=$SA_SCC_RUNASUSER
     ```
 
     outputs,
