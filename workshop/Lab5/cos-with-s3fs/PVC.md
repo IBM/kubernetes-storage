@@ -53,7 +53,7 @@ spec:
     storageClassName: ibmc-s3fs-standard-regional' > my-iks-pvc.yaml
 ```
 
-    **Note**: indentation in YAML is important. If the PVC status remains `Pending`, the two usual suspects will be the `secret` with its credentials and the indentation in the YAML of the PVC.
+**Note**: indentation in YAML is important. If the PVC status remains `Pending`, the two usual suspects will be the `secret` with its credentials and the indentation in the YAML of the PVC.
 
 1. In `Theia` the integrated browser IDE, in the directory `/project/cos-with-s3fs`, open the file `my-iks-pvc.yaml`, and set the right values if changes are still needed, 
     
