@@ -57,6 +57,19 @@ Steps:
     Default   282d2f25256540499cf99b43b34025bf   true    ACTIVE
     ```
 
+    If you have an existing resource group that is different than the default value `Default`, change the environment variable `$RESOURCEGROUP`. For example, if you have an existing resource group called `default` with lowercase `d`, change the environment variable,
+
+    ```
+    RESOURCEGROUP=default
+    ```
+
+    or use the following command to set the environment variable automatically,
+
+    ```
+    RESOURCEGROUP=$(ibmcloud resource groups --output json | jq -r '.[0].name')
+    echo $RESOURCEGROUP
+    ```
+
     If you do not have a resource group, create one,
 
     ```
