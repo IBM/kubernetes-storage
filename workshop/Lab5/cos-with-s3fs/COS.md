@@ -21,7 +21,7 @@ Steps:
     COS_PLAN=Lite
     COS_BUCKET_NAME=$(date | md5sum | head -c10)-bucket-1
     REGION=us-south
-    COS_ENDPOINT=s3.private.$REGION.cloud-object-storage.appdomain.cloud
+    COS_PRIVATE_ENDPOINT=s3.private.$REGION.cloud-object-storage.appdomain.cloud
     ```
 
 2. Create an instance of the `IBM Cloud Object Storage` service. For information, go to https://cloud.ibm.com/catalog/services/cloud-object-storage. You can only have 1 single free Lite instance per account. Login to your **personal account**,
@@ -274,8 +274,8 @@ The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object 
 
     ```
     REGION=us-south
-    COS_ENDPOINT=s3.private.$REGION.cloud-object-storage.appdomain.cloud
-    echo $COS_ENDPOINT
+    COS_PRIVATE_ENDPOINT=s3.private.$REGION.cloud-object-storage.appdomain.cloud
+    echo $COS_PRIVATE_ENDPOINT
     ```
 
 2. **In a browser**, you can verify the private endpoint for your region by navigating to https://cloud.ibm.com/resources.
@@ -287,7 +287,7 @@ The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object 
 
        ![](../.gitbook/images/cos-04.png)
 
-   5.  Take note of the `Private` endpoint. It should match your environment variable $COS_ENDPOINT
+   5.  Take note of the `Private` endpoint. It should match your environment variable $COS_PRIVATE_ENDPOINT
 
 ## Next
 

@@ -18,7 +18,7 @@ In this exercise, you are going to use an existing bucket when assigning persist
 
     > Note: The `secret-name` should be set to `cos-write-access` unless you changed the name of the secret we created earlier,
 
-    > Note: `ibm.io/endpoint` should be set to the output of command `echo "https://$PRIVATE_ENDPOINT"` 
+    > Note: `ibm.io/endpoint` should be set to the output of command `echo "https://$COS_PRIVATE_ENDPOINT"` 
 
     > Create the file first and then edit the file with `vi` if changes are needed,
 
