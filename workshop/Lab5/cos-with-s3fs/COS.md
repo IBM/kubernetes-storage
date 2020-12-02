@@ -227,31 +227,9 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
 
 ## Get Private Endpoint
 
-1. Get your object storage configurations with the CRN set,
+The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object Storage instance to mount the bucket. The correct endpoint can be found using the region in which your Object Storage is located.
 
-    ```
-    ibmcloud cos config list
-    ```
-
-    outputs,
-
-    ```
-    $ ibmcloud cos config list
-    Key                     Value
-    Last Updated            Saturday, November 07 2020 at 22:47:38
-    Default Region          us-south
-    Download Location       /home/theia/Downloads
-    CRN                     crn:v1:bluemix:public:cloud-object-storage:global:a/31296e3a285f42fdadd51ce14beba65e:5260b21c-80eb-4d72-a019-d11112079e85::
-    AccessKeyID
-    SecretAccessKey
-    Authentication Method   IAM
-    URL Style               VHost
-    Service Endpoint
-    ```
-
-    This will list your default region, e.g. `us-south` in the example above.
-
-    To list your bucket's location use
+1. To list your bucket's location use
 
     ```
     ibmcloud cos get-bucket-location --bucket $COS_BUCKET_NAME
