@@ -8,15 +8,29 @@ When looking at what kind of storage class you would like to use in Kubernetes, 
 
 In this lab we will deploy a Mongo database on top of block storage on Kubernetes.
 
+![archDiagram](./images/archDiagram.png)
+
+The basic architecture is as follows
+
+1. When we install MongoDB with the helm chart, a `Persistent Volume Claim` (PVC) is created on the cluster. This PVC is a request for storage to be used by the application.
+
+2. In IBM Cloud, the request goes to the IBM Cloud storage provider which then provisions a physical storage device within IBM Cloud.
+
+3. A `Persistent Volume` (PV) is then created which acts as a reference to the physical storage device created earlier. This PV is then mounted as a directory in a container's file system.
+
+4. The guestbook application receives requests to store guestbook entries from the user which the guestbook pod then sends to the MongoDB pod to store.
+
+5. The MongoDB pod receives the request to store information and persists the data to the mounted directory from the Persistent Volume.
+
 ## Setup
 
 Before we get into the lab we first need to do some setup to ensure that the lab will flow smoothly.
 
-1. Replace `<docker username>` with your DockerHub username and run the following command (be sure to replace the `< >` too!).
+<!-- 1. Replace `<docker username>` with your DockerHub username and run the following command (be sure to replace the `< >` too!).
 
 ```bash
-DOCKER_USERNAME=<docker username>
-```
+DOCKERUSER=<docker username>
+``` -->
 
 1. In your terminal, navigate to where you would like to store the files used in this lab and run the following.
 
@@ -40,6 +54,39 @@ kubectl create namespace mongo
 By default IBM Kubernetes Service Clusters don't have the option to deploy block storage persistent volumes. However, there is an easy process to add the block storage `storageClass` to your cluster through the use of an automated helm chart install.
 
 1. Follow the steps outlined [here](https://cloud.ibm.com/docs/containers?topic=containers-block_storage#install_block) to install the block storage `storageClass`.
+
+1. First you need to add the `iks-charts` helm repo to your local helm repos. This will allow you to utilize a variety of charts to install software on the IBM Kubernetes Service.
+
+    ```bash
+    helm repo add iks-charts https://icr.io/helm/iks-charts
+    ```
+
+1. Then, we need to update the repo to ensure that we have the latest charts:
+
+    ```bash
+    helm repo update
+    ```
+
+1. Install the block storage plugin from the `iks-charts` repo:
+
+    ```bash
+    helm install block-storage-plugin iks-charts/ibmcloud-block-storage-plugin
+    ```
+
+1. Lastly, verify that the plugin installation was successful by retrieving the list of storage classes in the cluster:
+
+    ```bash
+    kubectl get storageclasses
+    ```
+
+    You should notice a few options that start with `ibmc-block` as seen below.
+
+    ```bash
+    NAME                       PROVISIONER         RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
+    ibmc-block-bronze          ibm.io/ibmc-block   Delete          Immediate           true                   62s
+    ibmc-block-custom          ibm.io/ibmc-block   Delete          Immediate           true                   62s
+    ibmc-block-gold            ibm.io/ibmc-block   Delete          Immediate           true                   62s
+    ```
 
 ## Helm Repo setup
 
@@ -83,7 +130,9 @@ Dryrun:
 helm install mongo bitnami/mongodb --set global.storageClass=ibmc-block-gold,auth.password=testing,auth.username=guestbookAdmin,auth.database=guestbook -n mongo --dry-run > mongdb-install-dryrun.yaml
 ```
 
-This command will test out our helm install command and save the output manifests in a file called `mongodb-install-dryrun.yaml`
+>There is a detailed breakdown of this command in the next section titled `Installing MongoDB` if you would like to understand what this helm command is doing.
+
+This command will test out our helm install command and save the output manifests in a file called `mongodb-install-dryrun.yaml`. You can then examine this manifest file so that you know exactly what will be installed on your cluster.
 
 Check out the file in your code editor and take a look at the `PersistentVolumeClaim` object. There should be a property named `storageClassName` in the spec and the value should be `ibmc-block-gold` to signify that we will be using block storage for our database.
 
@@ -264,9 +313,9 @@ In this file we are telling the application which datasource we should use; in-m
 
 ```bash
 cd $WORK_DIR/guestbook-nodejs/src
-IMAGE_NAME=$DOCKER_USERNAME/guestbook-nodejs:mongo
+IMAGE_NAME=$DOCKERUSER/guestbook-nodejs:mongo
 docker build -t $IMAGE_NAME .
-docker login -u $DOCKER_USERNAME
+docker login -u $DOCKERUSER
 docker push $IMAGE_NAME
 ```
 
