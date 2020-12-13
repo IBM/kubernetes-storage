@@ -6,7 +6,9 @@ This hands-on lab for object storage on Kubernetes is called `Add Object Storage
 
 `IBM Cloud Object Storage plugin` is a Kubernetes volume plugin that enables Kubernetes pods to access `IBM Cloud Object Storage` buckets. The plugin has two components: a dynamic provisioner and a FlexVolume driver for mounting the buckets using `s3fs-fuse` on a worker node.
 
-[`s3fs`](https://github.com/s3fs-fuse/s3fs-fuse) allows Linux and macOS to mount an S3 bucket via FUSE. If you want to learn more about `s3fs-fuse` and FUSE you can do the optional [s3fs lab](../fuse/README.md).
+`FlexVolume` is a so-called `out-of-tree` volume plugin, as is the `Container Storage Interface (CSI)`. `Out-of-tree` volume plugins enable storage developers to create custom storage plugins. For more information about `FlexVolume`, go to [flexvolume](../../flexvolume/README.md).
+
+[`s3fs`](https://github.com/s3fs-fuse/s3fs-fuse) allows Linux and macOS to mount an S3 bucket via FUSE. If you want to learn more about `s3fs-fuse` and FUSE you can do the optional [s3fs lab](../fuse/README.md). 
 
 ![](../images/cos-plugin-architecture.png)
 
