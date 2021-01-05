@@ -342,6 +342,7 @@ NAME            STATUS   ROLES    AGE    VERSION
 ```
 
 To extend our table from Lab 1 we now have:
+
 | Storage Type  |  Persisted at which level | Example  Uses
 | - | - | - |
 | Container local storage | Container | ephermal state
@@ -349,7 +350,6 @@ To extend our table from Lab 1 we now have:
 | Primary Storage ([HostPath](https://kubernetes.io/docs/concepts/storage/volumes/#hostpath)) | Node | Running cAdvisor in a container
 | IBM Cloud File Storage (NFS) | Availabilty Zone | Applications running in a single availabilty zone
 
-<br>
 Data is available to all nodes within the availability zone where the file storage exists, but the `accessMode` parameter on the `PersistentVolumeClaim` determines if multiple pods are able to mount a volume specificed by a PVC. The possible values for this parameter are:
 
 - **ReadWriteMany**: The PVC can be mounted by multiple pods. All pods can read from and write to the volume.
@@ -366,7 +366,6 @@ Another way to see that the data is persisted at the availability zone level, yo
 - Delete the Kubernetes cluster.
 - Create a new cluster and reuse the volume.
 
-##
 ## Clean up
 
 List all the PVCs and PVs
