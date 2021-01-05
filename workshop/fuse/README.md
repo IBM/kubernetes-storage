@@ -21,6 +21,7 @@ s3fs on macOS uses [`osxfuse`](https://osxfuse.github.io/). osxfuse is FUSE for 
 In this lab, you will [mount a bucket using s3fs](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-s3fs). You need admin access to install `s3fs-fuse`. In this lab, I used `brew` on macOS, for other Operating Systems, see the [installation instructions](https://github.com/s3fs-fuse/s3fs-fuse).
 
 Pre-requirements:
+
 * A free IBM Cloud account,
 * A free IBM Cloud Object Storage (COS) instance with a bucket,
 * Admin access to your client OS,
@@ -29,7 +30,7 @@ Pre-requirements:
 
 You have to be logged in to your IBM Cloud account,
 
-```
+```console
 ibmcloud login -u <IBMId>
 ```
 
@@ -37,7 +38,7 @@ If you are using Single Sign-On (SSO) use the `-sso` flag to log in.
 
 Select the account with your instance of Object Storage. In the example below, I have to select account **1** under my own name, e.g. `B Newell's Account',
 
-```
+```console
 Select an account:
     1. B Newell's Account (31296e3a285f)
     2. IBM Client Developer Advocacy (e65910fa61) <-> 1234567
@@ -45,9 +46,9 @@ Select an account:
     Targeted account B Newell's Account (31296e3a285f)
 ```
 
-Then, set an environment variable with the bucket name, and upload a document to your bucket in the IBM Cloud Object Storage instance. 
+Then, set an environment variable with the bucket name, and upload a document to your bucket in the IBM Cloud Object Storage instance.
 
-```
+```console
 COS_NAME=<cos-instance-name>
 COS_BUCKET_NAME=<cos-bucket-name>
 ```
@@ -56,14 +57,14 @@ COS_BUCKET_NAME=<cos-bucket-name>
 
 Create a new document,
 
-```
+```console
 COS_OBJECT_KEY=helloworld.txt
 echo "Hello World! Today is $(date)" > $COS_OBJECT_KEY
 ```
 
 [Upload an object using S3Manager](https://cloud.ibm.com/docs/cli?topic=cloud-object-storage-cli-plugin-ic-cos-cli#ic-upload-s3manager),
 
-```
+```console
 ibmcloud cos upload --bucket $COS_BUCKET_NAME --key $COS_OBJECT_KEY --file ./helloworld.txt --content-language en-US --content-type "text/plain"
 
 OK
@@ -74,31 +75,31 @@ Successfully uploaded object 'helloworld.txt' to bucket 'e59a327194-cos-1-bucket
 
 Install `s3fs`,
 
-```
+```console
 brew install s3fs
 ```
 
 If you already have credentials with HMAC keys created for your Object Storage instance, you can retrieve credentials using,
 
-```
+```console
 ibmcloud resource service-keys --output json
 ```
 
 Set an environment variable `COS_CREDENTIALS` with the name of the credentials,
 
-```
+```console
 COS_CREDENTIALS=$(ibmcloud resource service-keys --output json | jq -r '.[0].credentials.iam_apikey_name')
 ```
 
 If you do not have credentials yet, create credentials for your IBM Cloud Object Storage instance with HMAC keys,
 
-```
+```console
 ibmcloud resource service-key-create $COS_CREDENTIALS Writer --instance-name $COS_NAME --parameters '{"HMAC":true}'
 ```
 
 Will create credentials including among other HMAC keys,
 
-```
+```console
 "cos_hmac_keys": {
     "access_key_id": "c407e90c41c3463b8e7722048aa48edc",
     "secret_access_key": "0f8c2cb6ef82c63d8d1f935a8ef6a87fe1bc16ed1ba8483c"
@@ -107,7 +108,7 @@ Will create credentials including among other HMAC keys,
 
 Create environment variables with the HMAC keys from the first credentials listed in your `service-keys` list. Change the index value if you have multiple `service-keys` or credentials. Create an S3FS password file,
 
-```
+```console
 COS_ACCESS_KEY=$(ibmcloud resource service-key $COS_CREDENTIALS --output json | jq -r '.[0].credentials.cos_hmac_keys.access_key_id')
 COS_SECRET_KEY=$(ibmcloud resource service-key $COS_CREDENTIALS --output json | jq -r '.[0].credentials.cos_hmac_keys.secret_access_key')
 
@@ -120,7 +121,7 @@ chmod 0600 $COS_S3FS_PASSWORD_FILE
 
 Mount the local directory using S3FS,
 
-```
+```console
 mkdir cos_data
 LOCAL_MOUNTPOINT=$(pwd)/cos_data
 COS_PUBLIC_ENDPOINT=s3.us-south.cloud-object-storage.appdomain.cloud

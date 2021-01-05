@@ -4,13 +4,13 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
 1. Add a Helm repository where `IBM Cloud Object Storage Plugin` chart resides.
 
-    ```
+    ```console
     helm repo add ibm-charts https://icr.io/helm/ibm-charts
     ```
 
     outputs,
 
-    ```
+    ```console
     $ helm repo add ibm-charts https://icr.io/helm/ibm-charts
 
     `ibm-charts` has been added to your repositories
@@ -18,13 +18,13 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
 1. Refresh your local Helm repository.
 
-    ```
+    ```console
     helm repo update
     ```
 
     outputs,
 
-    ```
+    ```console
     $ helm repo update
 
     Hang tight while we grab the latest from your chart repositories...
@@ -34,7 +34,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
 1. Download and unzip the `IBM Cloud Object Storage` plugin to your client, then install the plugin to your cluster from local client.
 
-    ```
+    ```console
     helm pull --untar ibm-charts/ibm-object-storage-plugin
     ls -al
     helm plugin install ./ibm-object-storage-plugin/helm-ibmc
@@ -42,7 +42,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
     should result in,
 
-    ```
+    ```console
     $ helm plugin install ./ibm-object-storage-plugin/helm-ibmc
 
     Installed plugin: ibmc
@@ -50,65 +50,64 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
 1. Housekeeping to allow execution of the `ibmc.sh` script by making the file executable.
 
-    ```
+    ```console
     chmod 755 $HOME/.local/share/helm/plugins/helm-ibmc/ibmc.sh
     ```
 
 1. Verify the `IBM Cloud Object Storage plugin` installation. The plugin usage information should be displayed when running the command below.
 
-    ```
+    ```console
     helm ibmc --help
     ```
 
 1. Before using the `IBM Cloud Object Storage Plugin`, configuration changes are required.
-2. In the `Cloud Shell` where you downloaded the IBM Cloud Object Storage plugin, navigate to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` folder of the `IBM Cloud Object Storage Plugin` installation.
+1. In the `Cloud Shell` where you downloaded the IBM Cloud Object Storage plugin, navigate to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` folder of the `IBM Cloud Object Storage Plugin` installation.
 
-    ```
+    ```console
     ls -al ibm-object-storage-plugin/templates
     ```
 
-3. Make sure the `provisioner-sa.yaml` file is present and configure it to access the COS service using the COS service credentials secret `cos-write-access` that you created in the previous section.
+1. Make sure the `provisioner-sa.yaml` file is present and configure it to access the COS service using the COS service credentials secret `cos-write-access` that you created in the previous section.
 
-4. In the Theia editor, click `File` > `Open`, and browse to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` directory and open the file `provisioner-sa.yaml`.
+1. In the Theia editor, click `File` > `Open`, and browse to the `/project/cos-with-s3fs/ibm-object-storage-plugin/templates` directory and open the file `provisioner-sa.yaml`.
 
     ![Theia - Open dir](../images/cos-with-s3fs/theia-open-dir.png)
 
-5. Search for content `ibmcloud-object-storage-secret-reader` in the file around line 62.
+1. Search for content `ibmcloud-object-storage-secret-reader` in the file around line 62.
 
     **in a `vi` editor**,
     - Type colon `:`
     - Type `/ibmcloud-object-storage-secret-reader`
     - Press `<ENTER>` key
 
-6. Scroll a few lines down to line #72 and find the section that is commented out `#resourceNames: [""]`.
+1. Scroll a few lines down to line #72 and find the section that is commented out `#resourceNames: [""]`.
 
-    ``` 
+    ```console
     rules:
     - apiGroups: [""]
         resources: ["secrets"]
         #resourceNames: [""]
     ```
 
-7. Uncomment the line and change the section to set the secret to `cos-write-access` and allow access to the COS instance,
+1. Uncomment the line and change the section to set the secret to `cos-write-access` and allow access to the COS instance,
 
-    ```
+    ```console
     rules:
     - apiGroups: [""]
         resources: ["secrets"]
         resourceNames: ["cos-write-access"]
     ```
 
-8. Save the change and close the file.
+1. Save the change and close the file.
+1. Install the configured storage classes for `IBM Cloud Object Storage`, which will use the edited template file.
 
-9. Install the configured storage classes for `IBM Cloud Object Storage`, which will use the edited template file.
-
-    ```
+    ```console
     helm ibmc install ibm-object-storage-plugin ./ibm-object-storage-plugin
     ```
 
     outputs,
 
-    ```
+    ```console
     $ helm ibmc install ibm-object-storage-plugin ./ibm-object-storage-plugin
 
     Helm version: v3.2.0+ge11b7ce
@@ -127,15 +126,15 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
     <and a whole lot more instructions>
     ```
 
-10. Verify that the storage classes are created successfully.
+1. Verify that the storage classes are created successfully.
 
-    ```
+    ```console
     oc get storageclass | grep 'ibmc-s3fs'
     ```
 
     outputs,
 
-    ```
+    ```console
     $ oc get storageclass | grep 'ibmc-s3fs'
 
     ibmc-s3fs-cold-cross-region    ibm.io/ibmc-s3fs    19s
@@ -152,15 +151,15 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
     ibmc-s3fs-vault-regional    ibm.io/ibmc-s3fs   19s
     ```
 
-11. Review the storage class `ibmc-s3fs-standard-regional`.
+1. Review the storage class `ibmc-s3fs-standard-regional`.
 
-    ```
+    ```console
     oc describe storageclass ibmc-s3fs-standard-regional
     ```
 
     outputs,
 
-    ```
+    ```console
     $ oc describe storageclass ibmc-s3fs-standard-regional
 
     Name:                  ibmc-s3fs-standard-regional
@@ -177,15 +176,15 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
     Additional information is available at https://cloud.ibm.com/docs/containers?topic=containers-object_storage#configure_cos.
 
-12. Verify that plugin pods are in "Running" state and indicate `READY` state of `1/1`:
+1. Verify that plugin pods are in "Running" state and indicate `READY` state of `1/1`:
 
-    ```
+    ```console
     oc get pods -n kube-system -o wide | grep object
     ```
 
     outputs,
 
-    ```
+    ```console
     $ oc get pods -n kube-system -o wide | grep object
 
     ibmcloud-object-storage-driver-p4ljp             0/1     Running   0          32s     10.169.231.148   10.169.231.148   <none>           <none>

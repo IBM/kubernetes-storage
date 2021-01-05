@@ -53,13 +53,13 @@ If you have an IBM Cloud account already, you can skip this step and login to yo
 
 ## 2. Setup Client CLI
 
-1. If you have already registered your account, you can access the lab environment at **https://labs.cognitiveclass.ai/** and login.
+1. If you have already registered your account, you can access the lab environment at [**https://labs.cognitiveclass.ai/**](https://labs.cognitiveclass.ai/) and login.
 
-1. Navigate to https://labs.cognitiveclass.ai/register,
+1. Navigate to [https://labs.cognitiveclass.ai/register](https://labs.cognitiveclass.ai/register),
 
     ![Cognitive Class button](../../.gitbook/cognitiveclass/cogClassButton.png)
 
-1. Create a new account with your existing `IBM Id.` 
+1. Create a new account with your existing `IBM Id.`
 
     ![Cognitive Class button](../../.gitbook/cognitiveclass/cogClassButton2.png)
 
@@ -79,28 +79,29 @@ If you have an IBM Cloud account already, you can skip this step and login to yo
 
 1. You will be taken to a blank editor page once your environment is ready.
 
-1.  What we really need is access to the terminal. Click on the `Terminal` tab near the top of the page and select **New Terminal**
+1. What we really need is access to the terminal. Click on the `Terminal` tab near the top of the page and select **New Terminal**
 
     ![New Terminal](../../.gitbook/cognitiveclass/newTerminal.png)
 
-1.  You can then click and drag the top of the terminal section upwards to make the terminal section bigger.
+1. You can then click and drag the top of the terminal section upwards to make the terminal section bigger.
 
     ![bigger terminal](../../.gitbook/cognitiveclass/biggerTerminal.png)
 
 ## 3. Access to an OpenShift Cluster
 
+To connect to a `RedHat OpenShift Kubernetes Service (ROKS)` instance, see the instructions [here](https://ibm.github.io/workshop-setup/ROKS/).
 
 ## 4. Environment Variables
 
 Create an environment variable for your IBM ID,
 
-```
+```console
 IBM_ID=<your ibm id>
 ```
 
 If completed, in your [terminal](https://labs.cognitiveclass.ai/), create a working directory named `cos-with-s3fs` to start the lab,
 
-```
+```console
 NAMESPACE=cos-with-s3fs
 mkdir $NAMESPACE
 cd $NAMESPACE

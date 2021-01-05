@@ -1,4 +1,4 @@
-# Create the PersistentVolumeClaim
+# Create a PersistentVolumeClaim
 
 Depending on the settings that you choose in your PVC, you can provision IBM Cloud Object Storage in the following ways:
 
@@ -9,22 +9,23 @@ In this exercise, you are going to use an existing bucket when assigning persist
 
 1. In the cloud shell connected to your cluster, create a `PersistentVolumeClaim` configuration file.
 
-    > Note: Replace the values for:
-      - `ibm.io/bucket`, 
-      - `ibm.io/secret-name` and 
+    > **Note:** Replace the values for:
+
+      - `ibm.io/bucket`,
+      - `ibm.io/secret-name` and
       - `ibm.io/endpoint`.
       
       If your values are not exactly matching with the bucket name you created, the secret name you created and the private endpoint of your bucket, the PVC will remain in state pending and fail to create.
 
-    > Note: The `secret-name` should be set to `cos-write-access` unless you changed the name of the secret we created earlier,
+    > **Note:** The `secret-name` should be set to `cos-write-access` unless you changed the name of the secret we created earlier,
 
-    > Note: `ibm.io/endpoint` should be set to the output of command `echo "https://$COS_PRIVATE_ENDPOINT"` 
+    > **Note:** `ibm.io/endpoint` should be set to the output of command `echo "https://$COS_PRIVATE_ENDPOINT"`
 
     > Create the file first and then edit the file with `vi` if changes are needed,
 
 1. You need the bucket name and namespace to configure the PVC,
 
-    ```
+    ```console
     echo "https://$COS_PRIVATE_ENDPOINT"
     echo $COS_BUCKET_NAME
     oc project
@@ -32,7 +33,7 @@ In this exercise, you are going to use an existing bucket when assigning persist
 
 1. Create the file,
 
-```
+```console
 echo 'kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -55,12 +56,12 @@ spec:
 
 **Note**: indentation in YAML is important. If the PVC status remains `Pending`, the two usual suspects will be the `secret` with its credentials and the indentation in the YAML of the PVC.
 
-1. In `Theia` the integrated browser IDE, in the directory `/project/cos-with-s3fs`, open the file `my-iks-pvc.yaml`, 
+1. In `Theia` the integrated browser IDE, in the directory `/project/cos-with-s3fs`, open the file `my-iks-pvc.yaml`,
 
-    ![](../images/cos-with-s3fs/theia-open-my-pvc.png)
+![](../images/cos-with-s3fs/theia-open-my-pvc.png)
 
-and set the right values if changes are still needed, 
-    
+and set the right values if changes are still needed,
+
     * change the `namespace` value to the project name found with `oc project`,
     * the `ibm.io/bucket` should be set to the value defined in `echo $COS_BUCKET_NAME`,
     * `ibm.io/secret-name` should be set to `"cos-write-access"`,
@@ -68,27 +69,27 @@ and set the right values if changes are still needed,
 
 1. Create a `PersistentVolumeClaim`.
 
-    ```
+    ```console
     oc apply -f my-iks-pvc.yaml
     ```
 
     outputs,
 
-    ```
+    ```console
     $ oc apply -f my-iks-pvc.yaml
 
     persistentvolumeclaim/my-iks-pvc created
     ```
 
-2. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
+1. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
 
-    ```
+    ```console
     oc get pvc
     ```
 
     should output a status of `Bound`,
 
-    ```
+    ```console
     $ oc get pvc
 
     NAME         STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS                  AGE
@@ -99,15 +100,15 @@ and set the right values if changes are still needed,
 
     > Note: If the state of the PVC stays as `Pending`, the problem must be resolved before you move to the next step.
 
-3. Verify a new `PersistentVolume` was also created successfully.
+1. Verify a new `PersistentVolume` was also created successfully.
 
-    ```
+    ```console
     oc get pv
     ```
 
     outputs,
 
-    ```
+    ```console
     $ oc get pv
 
     NAME    CAPACITY    ACCESS MODES    RECLAIM POLICY    STATUS   CLAIM    STORAGECLASS    REASON    AGE
