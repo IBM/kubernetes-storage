@@ -4,11 +4,13 @@
 
 [Filesystem in Userspace (FUSE)](https://en.wikipedia.org/wiki/Filesystem_in_Userspace) lets non-privileged users create a file system in their user space. The FUSE project consists of two components: a FUSE kernel module that is part of the Linux kernel since version 2.6.14, and the `libfuse` userspace library. The [`libfuse` library](https://github.com/libfuse/libfuse) provides a reference implementation for communication with the FUSE kernel module, providing client functions to mount the file system, unmount it, read requests from the kernel, and send responses back. FUSE is particularly useful for writing Virtual File Systems (VFS).
 
+![FUSE architecture](images/fuse-arch.png)
+
 ### s3fs
 
-`s3fs` or `s3fs-fuse` is an Amazon S3 (Services Simple Storage) and S3-based object stores compatible FUSE filesystem disk management utility that supports a subset of [Single UNIX Specification (SUS)](https://en.wikipedia.org/wiki/Single_UNIX_Specification) or [POSIX](https://en.wikipedia.org/wiki/POSIX) including reading/writing files, directories, symlinks, mode, uid/gid, and extended attributes, while preserving the original file format, e.g. a plain text or MS Word document
+If you want to use Object Storage as the underlying storage for FUSE-based filesystem disk management, you can use [`s3fs` or `s3fs-fuse`](https://github.com/s3fs-fuse/s3fs-fuse). `s3fs` is an Amazon S3 (Services Simple Storage) and S3-based object stores compatible utility for FUSE-based filesystem disk management that supports a subset of [Single UNIX Specification (SUS)](https://en.wikipedia.org/wiki/Single_UNIX_Specification) or [POSIX](https://en.wikipedia.org/wiki/POSIX) including reading/writing files, directories, symlinks, mode, uid/gid, and extended attributes, while preserving the original file format, e.g. a plain text or MS Word document.
 
-Applications that need to read and write to an NFS-style filesystem can use s3fs. It with easily integrates applications with S3 compatible storage like [IBM Cloud Object Storage](https://cloud.ibm.com/docs/cloud-object-storage). s3fs also allows you to interact with your cloud storage using familiar shell commands, like `ls` for listing or `cp` to copy files.
+Applications that need to read and write to an NFS-style filesystem can use s3fs, which integrates applications with S3 compatible storage like [IBM Cloud Object Storage](https://cloud.ibm.com/docs/cloud-object-storage). s3fs also allows you to interact with your cloud storage using familiar shell commands, like `ls` for listing or `cp` to copy files.
 
 Performance is not equal to a true local filesystem, but you can use some advanced options to increase throughput. Object storage services have high-latency for time to first byte and lack `random write` access (requires rewriting the full object). Workloads that only read big files, like deep learning workloads, can achieve good throughput using s3fs.
 
@@ -71,6 +73,7 @@ Successfully uploaded object 'helloworld.txt' to bucket 'e59a327194-cos-1-bucket
 ### Install s3fs
 
 Install `s3fs`,
+
 ```
 brew install s3fs
 ```

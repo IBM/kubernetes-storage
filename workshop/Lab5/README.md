@@ -46,15 +46,15 @@ The IBM Cloud Object Storage (COS) offers a few features that help secure your d
 - General Data Protection Regulation (GDPR) ready,
 - Privacy shield certified.
 
-At a high level, information on IBM Cloud Object Storage (COS) is encrypted, then dispersed across multiple geographic locations, and accessed over popular protocols like HTTP with a RESTful API.
+At a high level, information on `IBM Cloud Object Storage (COS)` is encrypted, then dispersed across multiple geographic locations, and accessed over popular protocols like HTTP with a RESTful API.
 
-SecureSlice distributes the data in slices across geo locations so that no full copy of data exists on any individual storage node, and automatically encrypts each segment of data before it is erasure coded and dispersed. 
+`SecureSlice` distributes the data in slices across geo locations so that no full copy of data exists on any individual storage node, and automatically encrypts each segment of data before it is erasure coded and dispersed. 
 
-The content can only be re-assembled through IBM Cloud’s `Accesser` technology at the client’s primary data center, where the data was originally received, and decrypted again by SecureSlice. 
+The content can only be re-assembled through IBM Cloud’s `Accesser` technology at the client’s primary data center, where the data was originally received, and decrypted again by `SecureSlice`. 
 
 `Data-in-place` or `data-at-rest` security is ensured when you persist database contents in IBM Cloud Object Storage. 
 
-You also have a choice to use integration capabilities with IBM Cloud Key Management Services like IBM Key Protect (using FIPS 140-2 Level 3 certified hardware security modules (HSMs)) and Hyper Protect Crypto Services (built on FIPS 140-2 Level 4-certified hardware) for enhanced security features and compliance.
+You also have a choice to use integration capabilities with IBM Cloud Key Management Services like `IBM Key Protect` (using FIPS 140-2 Level 3 certified hardware security modules (HSMs)) and `Hyper Protect Crypto Services` (built on FIPS 140-2 Level 4-certified hardware) for enhanced security features and compliance.
 
 ## About IBM Cloud Object Storage Plugin
 

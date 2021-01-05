@@ -1,6 +1,12 @@
 # IBM Cloud Object Storage plugin
 
-[IBM Cloud Object Storage plug-in](https://github.com/IBM/ibmcloud-object-storage-plugin/blob/master/README.md) is a Kubernetes Volume plug-in that enables Kubernetes pods to access IBM Cloud Object Storage buckets. The plug-in has two components: a dynamic provisioner and a FlexVolume driver for mounting the buckets using `s3fs-fuse` on a worker node. You can read more about Filesystems for User Spaces (FUSE) and `s3fs-fuse` in the [s3fs-fuse lab](../fuse/README.md).
+[IBM Cloud Object Storage plug-in](https://github.com/IBM/ibmcloud-object-storage-plugin/blob/master/README.md) is a Kubernetes Volume plug-in that enables Kubernetes pods to access IBM Cloud Object Storage buckets. 
+
+The plug-in has two components: 
+1. a dynamic provisioner (Object Storage Bucket Provisioner), and 
+2. a FlexVolume driver (Kube FlexDriver) for mounting the buckets using `s3fs-fuse` on a worker node. You can read more about Filesystems for User Spaces (FUSE) and `s3fs-fuse` in the [s3fs-fuse lab](../fuse/README.md).
+
+![IBM Cloud Object Storage plugin architecture](../../.gitbook/ibmcos-plugin-arch.png)
 
 See: https://medium.com/ai-platforms-research/fundamentals-of-ibm-cloud-storage-solutions-8739f36f024e
 
