@@ -59,7 +59,6 @@ ibmcloud iam api-key-create $IAM_APIKEY_NAME --file $IAM_APIKEY_NAME.txt
     ibmcloud resource service-instance-create $COS_NAME cloud-object-storage $COS_PLAN global -g $RESOURCEGROUP
     ```
 
-
 1. Get the GUID for the Cloud Object Storage service,
 
     ```console

@@ -174,7 +174,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
     Events:                <none>
     ```
 
-    Additional information is available at https://cloud.ibm.com/docs/containers?topic=containers-object_storage#configure_cos.
+    Additional information is available at [https://cloud.ibm.com/docs/containers?topic=containers-object_storage#configure_cos](https://cloud.ibm.com/docs/containers?topic=containers-object_storage#configure_cos).
 
 1. Verify that plugin pods are in "Running" state and indicate `READY` state of `1/1`:
 

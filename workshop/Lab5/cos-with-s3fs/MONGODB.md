@@ -7,7 +7,7 @@ In this section, you are going to deploy an instance of MongoDB to your OpenShif
 1. [Optional] If you want to configure the MongoDB via a `values.yaml` file, or want to review the default values of the Helm chart, in the `Cloud Shell`, you can download the default `values.yaml` file from the bitnami/mongodb Helm chart, which is used to configure and deploy the MongoDB Helm chart. In this lab we will overwrite the values from the commandline when we install the chart.
 
     ```console
-    $ wget https://raw.githubusercontent.com/bitnami/charts/master/bitnami/mongodb/values.yaml
+    wget https://raw.githubusercontent.com/bitnami/charts/master/bitnami/mongodb/values.yaml
     ```
 
 1. [Optional] To review the available configuration options, open the `values.yaml` file in a file editor and review the parameters that can be modified during mongdb deployment. In this exercise however, you'll overwrite the default values using Helm command parameters instead of a `values.yaml` file.

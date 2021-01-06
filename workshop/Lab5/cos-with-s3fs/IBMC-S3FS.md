@@ -19,7 +19,7 @@ S3, the Simple Storage Service, originated as Amazon. the central storage compon
 
 Instead of always providing all parameters via the API, it is more convenient to mount the bucket as a folder onto the existing file system. This can be done via s3fs or goofys.
 
-## Using s3fs 
+## Using s3fs
 
 Create a credentials file `~/.cos_creds` with:
 

@@ -11,19 +11,17 @@ In this exercise, you are going to use an existing bucket when assigning persist
 
     > **Note:** Replace the values for:
 
-      - `ibm.io/bucket`,
-      - `ibm.io/secret-name` and
-      - `ibm.io/endpoint`.
-      
+      * `ibm.io/bucket`,
+      * `ibm.io/secret-name` and
+      * `ibm.io/endpoint`.
+
       If your values are not exactly matching with the bucket name you created, the secret name you created and the private endpoint of your bucket, the PVC will remain in state pending and fail to create.
 
     > **Note:** The `secret-name` should be set to `cos-write-access` unless you changed the name of the secret we created earlier,
-
     > **Note:** `ibm.io/endpoint` should be set to the output of command `echo "https://$COS_PRIVATE_ENDPOINT"`
-
     > Create the file first and then edit the file with `vi` if changes are needed,
 
-1. You need the bucket name and namespace to configure the PVC,
+2. You need the bucket name and namespace to configure the PVC,
 
     ```console
     echo "https://$COS_PRIVATE_ENDPOINT"
@@ -31,7 +29,7 @@ In this exercise, you are going to use an existing bucket when assigning persist
     oc project
     ```
 
-1. Create the file,
+3. Create the file,
 
 ```console
 echo 'kind: PersistentVolumeClaim
@@ -58,14 +56,14 @@ spec:
 
 1. In `Theia` the integrated browser IDE, in the directory `/project/cos-with-s3fs`, open the file `my-iks-pvc.yaml`,
 
-![](../images/cos-with-s3fs/theia-open-my-pvc.png)
+![Theia IDE Open File](../images/cos-with-s3fs/theia-open-my-pvc.png)
 
 and set the right values if changes are still needed,
 
-    * change the `namespace` value to the project name found with `oc project`,
-    * the `ibm.io/bucket` should be set to the value defined in `echo $COS_BUCKET_NAME`,
-    * `ibm.io/secret-name` should be set to `"cos-write-access"`,
-    * validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage bucket for the correct region,
+* change the `namespace` value to the project name found with `oc project`,
+* the `ibm.io/bucket` should be set to the value defined in `echo $COS_BUCKET_NAME`,
+* `ibm.io/secret-name` should be set to `"cos-write-access"`,
+* validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage bucket for the correct region,
 
 1. Create a `PersistentVolumeClaim`.
 
@@ -97,7 +95,6 @@ and set the right values if changes are still needed,
     ```
 
     > Note: If the state of the PVC remains `Pending`, you can inspect the error for why the PVC remains pending by using the `describe` command: `oc describe pvc <pvc_name>`. For example, `oc describe pvc my-iks-pvc`.
-
     > Note: If the state of the PVC stays as `Pending`, the problem must be resolved before you move to the next step.
 
 1. Verify a new `PersistentVolume` was also created successfully.

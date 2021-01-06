@@ -25,7 +25,7 @@ Steps:
     COS_PRIVATE_ENDPOINT=s3.private.$REGION.cloud-object-storage.appdomain.cloud
     ```
 
-1. Create an instance of the `IBM Cloud Object Storage` service. For information, go to https://cloud.ibm.com/catalog/services/cloud-object-storage. You can only have 1 single free Lite instance per account. Login to your **personal account**,
+2. Create an instance of the `IBM Cloud Object Storage` service. For information about the IBM Cloud Object Storage service, go [here](https://cloud.ibm.com/catalog/servicecloud-object-storage). You can only have 1 single free Lite instance per account. Login to your **personal account**,
 
     ```console
     ibmcloud login -u $IBM_ID
@@ -33,7 +33,7 @@ Steps:
 
     **Note:** if you use a single-sign-on provider, use the `-sso` flag.
 
-1. You will be prompted to select an account. You must choose your own account under your own name. In the example below, account 1 is my own account under my own name, account 2 is where my Kubernetes cluster is located and that was provisioned to me, but on that second account I have no permission to create new resources. I have to select account **1** under my own name, e.g. `B Newell's Account',
+3. You will be prompted to select an account. You must choose your own account under your own name. In the example below, account 1 is my own account under my own name, account 2 is where my Kubernetes cluster is located and that was provisioned to me, but on that second account I have no permission to create new resources. I have to select account **1** under my own name, e.g. `B Newell's Account',
 
     ```console
     Select an account:
@@ -43,7 +43,7 @@ Steps:
       Targeted account B Newell's Account (31296e3a285f)
     ```
 
-1. You also need a resource group. Check if a resource-group exists,
+4. You also need a resource group. Check if a resource-group exists,
 
     ```console
     ibmcloud resource groups
@@ -87,7 +87,7 @@ Steps:
     Resource Group ID: 93f7a4cd3c824c0cbe90d8f21b46f758
     ```
 
-1. Set the environment variable $RESOURCEGROUP,
+5. Set the environment variable $RESOURCEGROUP,
 
     ```console
     RESOURCEGROUP=$(ibmcloud resource groups --output json | jq -r '.[0].name')
@@ -176,7 +176,7 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
     ```
 
     Review the CRN property.
-    
+
     ```console
     $ ibmcloud cos config list
     Key                     Value   
@@ -200,10 +200,10 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
     Check the config again, to make sure the CRN is set now,
 
     ```console
-    $ ibmcloud cos config list
+    ibmcloud cos config list
     ```
 
-1. Create a new bucket.
+2. Create a new bucket.
 
     ```console
     ibmcloud cos bucket-create --bucket $COS_BUCKET_NAME --class Standard --ibm-service-instance-id $COS_CRN
@@ -220,7 +220,7 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
     Class: Standard
     ```
 
-1. Verify the new bucket was created successfully.
+3. Verify the new bucket was created successfully.
 
     ```console
     ibmcloud cos list-buckets --ibm-service-instance-id $COS_CRN
@@ -269,7 +269,7 @@ The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object 
     ServiceEndpointURL
     ```
 
-    With your bucket's location, e.g. `us-south`, you can find your bucket's private endpoint here https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-endpoints#advanced-endpoint-types, OR in the following steps you find it in your Cloud Object Storage's bucket configuration.
+    With your bucket's location, e.g. `us-south`, you can find your bucket's private endpoint here [https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-endpoints#advanced-endpoint-types](https://cloud.ibm.com/docs/cloud-object-storage?topic=cloud-object-storage-endpoints#advanced-endpoint-types), OR in the following steps you find it in your Cloud Object Storage's bucket configuration.
 
     If your region is `us-south` the private endpoint is `s3.private.us-south.cloud-object-storage.appdomain.cloud`. Set an environment variable `$REGION` with the found region, and construct the service endpoint as follows.
 
@@ -279,16 +279,16 @@ The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object 
     echo $COS_PRIVATE_ENDPOINT
     ```
 
-1. **In a browser**, you can verify the private endpoint for your region by navigating to https://cloud.ibm.com/resources.
+1. **In a browser**, you can verify the private endpoint for your region by navigating to [https://cloud.ibm.com/resources](https://cloud.ibm.com/resources).
 
    1. Expand the Storage section.
    1. Locate and select your IBM Cloud Object Storage service instance.
    1. In the left menu, select the `buckets` section Select your new `bucket` in the `Buckets` tab.
-   1.  Select the `Configuration` tab under `Buckets` iin the left pane.
+   1. Select the `Configuration` tab under `Buckets` iin the left pane.
 
-       ![](../.gitbook/images/cos-04.png)
+       ![Buckets](../.gitbook/images/cos-04.png)
 
-   1.  Take note of the `Private` endpoint. It should match your environment variable `$COS_PRIVATE_ENDPOINT`.
+   1. Take note of the `Private` endpoint. It should match your environment variable `$COS_PRIVATE_ENDPOINT`.
 
 ## Next
 
