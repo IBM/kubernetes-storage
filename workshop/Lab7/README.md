@@ -74,7 +74,7 @@ With the IBM Cloud Kubernetes Service clusters at version 1.16 and later, the Op
 
 We will configure the IBM Cloud Operator to manage resources on your personal IBM Cloud Account. You will be able to create and manage a Cloudant DB lite service that only you will have access to. 
 
-Note: The account that your Cloudant service will be created on MAY be different than the account where your Kubernetes account, so please keep that in mind. If you are participating in a workshop with the IBM Developer Advocacy team, we do this to avoid creating multiple lite cloudantDB services on the shared account where all the k8s clusters are running (IBM Cloud accounts are limited to 1 lite instance per service)
+Note: The account that your Cloudant service will be created on MAY be different than the account where your Kubernetes cluster is located, so please keep that in mind. If you are participating in a workshop with the IBM Developer Advocacy team, we do this to avoid creating multiple lite cloudantDB services on the shared account where all the k8s clusters are running (IBM Cloud accounts are limited to 1 lite instance per service)
 
 1. Login to your personal IBM Cloud account. Use `--sso` if using single-sign-on. Select your personal account when asked upon logging in.
 
@@ -115,6 +115,12 @@ Note: The account that your Cloudant service will be created on MAY be different
 
     ```
     ibmcloud iam service-policy-create serviceid-ico --roles Manager --resource-group-name default --region us-south
+    ```
+
+1. We will also need to provide Account Management to allow us to create an cloudant service on our IBM Cloud account: 
+
+    ```
+    ibmcloud iam service-policy-create serviceid-ico --account-management --roles Administrator
     ```
 
 1. Create an API key for the service ID.
@@ -186,7 +192,7 @@ For an application running within a Kubernetes cluster to be able to access an I
 1. Change into the `yaml` directory. apply the `cloudant-ibmcloud.yaml` file.
 
     ```console
-    cd $HOME/guestbook-nodejs-config/src/yaml
+    cd $HOME/guestbook-nodejs-config/storage/lab7
     ```
 
 1. Apply the `cloudant-ibmcloud.yaml` file using kubectl. This file defines a **Service** and **Binding** resource:
