@@ -60,7 +60,7 @@ You now have an Object Storage instance with a bucket, and have found the corres
     1. Go to the IBM Cloud resources page at [https://cloud.ibm.com/resources](https://cloud.ibm.com/resources),
     Under `Clusters` find and select your cluster, and load the cluster overview page. There are two ways to retrieve the login command with token:
     1. Click the `Actions` drop down next to the `OpenShift web console` button, and select `Connect via CLI`, in the pop-up window, click the `oauth token request page` link, or
-    2. Click `OpenShift web console` button, in the `OpenShift web console`, click your profile name, such as `IAM#name@email.com`, and then click `Copy Login Command`.
+    1. Click `OpenShift web console` button, in the `OpenShift web console`, click your profile name, such as `IAM#name@email.com`, and then click `Copy Login Command`.
 
     ![Copy Login Command](../images/cluster/ocp_copylogincommand.png)
 

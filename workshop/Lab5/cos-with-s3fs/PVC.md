@@ -11,9 +11,9 @@ In this exercise, you are going to use an existing bucket when assigning persist
 
     > **Note:** Replace the values for:
 
-      * `ibm.io/bucket`,
-      * `ibm.io/secret-name` and
-      * `ibm.io/endpoint`.
+      - `ibm.io/bucket`,
+      - `ibm.io/secret-name` and
+      - `ibm.io/endpoint`.
 
       If your values are not exactly matching with the bucket name you created, the secret name you created and the private endpoint of your bucket, the PVC will remain in state pending and fail to create.
 
@@ -60,10 +60,10 @@ spec:
 
 and set the right values if changes are still needed,
 
-* change the `namespace` value to the project name found with `oc project`,
-* the `ibm.io/bucket` should be set to the value defined in `echo $COS_BUCKET_NAME`,
-* `ibm.io/secret-name` should be set to `"cos-write-access"`,
-* validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage bucket for the correct region,
+- change the `namespace` value to the project name found with `oc project`,
+- the `ibm.io/bucket` should be set to the value defined in `echo $COS_BUCKET_NAME`,
+- `ibm.io/secret-name` should be set to `"cos-write-access"`,
+- validate the `ibm.io/endpoint` to be set to the private service endpoint for your Object Storage bucket for the correct region,
 
 1. Create a `PersistentVolumeClaim`.
 
@@ -79,7 +79,7 @@ and set the right values if changes are still needed,
     persistentvolumeclaim/my-iks-pvc created
     ```
 
-1. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
+2. Verify the `PersistentVolumeClaim` and through the PVC also the `PersistentVolume` or PV was created successfully and that the PVC has `STATUS` of `Bound`.
 
     ```console
     oc get pvc
@@ -97,7 +97,7 @@ and set the right values if changes are still needed,
     > Note: If the state of the PVC remains `Pending`, you can inspect the error for why the PVC remains pending by using the `describe` command: `oc describe pvc <pvc_name>`. For example, `oc describe pvc my-iks-pvc`.
     > Note: If the state of the PVC stays as `Pending`, the problem must be resolved before you move to the next step.
 
-1. Verify a new `PersistentVolume` was also created successfully.
+3. Verify a new `PersistentVolume` was also created successfully.
 
     ```console
     oc get pv

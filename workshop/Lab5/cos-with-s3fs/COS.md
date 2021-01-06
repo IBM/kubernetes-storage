@@ -203,7 +203,7 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
     ibmcloud cos config list
     ```
 
-2. Create a new bucket.
+1. Create a new bucket.
 
     ```console
     ibmcloud cos bucket-create --bucket $COS_BUCKET_NAME --class Standard --ibm-service-instance-id $COS_CRN
@@ -220,7 +220,7 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
     Class: Standard
     ```
 
-3. Verify the new bucket was created successfully.
+1. Verify the new bucket was created successfully.
 
     ```console
     ibmcloud cos list-buckets --ibm-service-instance-id $COS_CRN
