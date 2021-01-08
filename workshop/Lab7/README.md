@@ -114,7 +114,7 @@ Note: The account that your Cloudant service will be created on MAY be different
 1. Assign the service ID access to the required permissions to work with the IBM Cloud services. You will need the **Manager** role to provision a Cloudant service.
 
     ```
-    ibmcloud iam service-policy-create serviceid-ico --roles Manager --resource-group-name default --region us-south
+    ibmcloud iam service-policy-create serviceid-ico --roles Manager,Administrator --resource-group-name default --region us-south
     ```
 
 1. We will also need to provide Account Management to allow us to create an cloudant service on our IBM Cloud account: 
