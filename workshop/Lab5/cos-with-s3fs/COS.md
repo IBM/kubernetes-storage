@@ -110,22 +110,22 @@ The Lite service plan for Cloud Object Storage includes Regional and Cross Regio
     $ ibmcloud resource service-instance-create cef84ff5ff-cos-1 cloud-object-storage Lite global -g Default
 
     OK
-    Service instance cef84ff5ff-cos-1  was created.                 
-    Name:             cef84ff5ff-cos-1    
-    ID:               crn:v1:bluemix:public:cloud-object-storage:global:a/          
-                        e65910fa61ce9072d64902d03f3d4774:fef2d369-5f88-4dcc-bbf1-9afffcd9ccc7::   
-    GUID:             fef2d369-5f88-4dcc-bbf1-9afffcd9ccc7   
-    Location:         global   
-    State:            active   
-    Type:             service_instance   
-    Sub Type:            
-    Allow Cleanup:    false   
-    Locked:           false   
-    Created at:       2020-05-29T15:55:26Z   
-    Updated at:       2020-05-29T15:55:26Z   
-    Last Operation:                   
-         Status    create succeeded      
-         Message   Completed create instance operation   
+    Service instance cef84ff5ff-cos-1  was created.
+    Name:             cef84ff5ff-cos-1
+    ID:               crn:v1:bluemix:public:cloud-object-storage:global:a/
+                        e65910fa61ce9072d64902d03f3d4774:fef2d369-5f88-4dcc-bbf1-9afffcd9ccc7::
+    GUID:             fef2d369-5f88-4dcc-bbf1-9afffcd9ccc7
+    Location:         global
+    State:            active
+    Type:             service_instance
+    Sub Type:
+    Allow Cleanup:    false
+    Locked:           false
+    Created at:       2020-05-29T15:55:26Z
+    Updated at:       2020-05-29T15:55:26Z
+    Last Operation:
+         Status    create succeeded
+         Message   Completed create instance operation
     ```
 
 1. List the object storage instance you created,
@@ -179,16 +179,16 @@ Data in `IBM Cloud Object Storage` is stored and organized in so-called `buckets
 
     ```console
     $ ibmcloud cos config list
-    Key                     Value   
-    Last Updated               
-    Default Region          us-south   
-    Download Location       /home/theia/Downloads   
-    CRN                        
-    AccessKeyID                
-    SecretAccessKey            
-    Authentication Method   IAM   
-    URL Style               VHost   
-    Service Endpoint    
+    Key                     Value
+    Last Updated
+    Default Region          us-south
+    Download Location       /home/theia/Downloads
+    CRN
+    AccessKeyID
+    SecretAccessKey
+    Authentication Method   IAM
+    URL Style               VHost
+    Service Endpoint
     ```
 
     If the CRN is not set as in the example above, you can set it explicitly as follows,
@@ -286,7 +286,7 @@ The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object 
    1. In the left menu, select the `buckets` section Select your new `bucket` in the `Buckets` tab.
    1. Select the `Configuration` tab under `Buckets` iin the left pane.
 
-       ![Buckets](../.gitbook/images/cos-04.png)
+       ![Buckets](../images/cos-04.png)
 
    1. Take note of the `Private` endpoint. It should match your environment variable `$COS_PRIVATE_ENDPOINT`.
 

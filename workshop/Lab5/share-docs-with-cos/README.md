@@ -34,8 +34,8 @@ ibmcloud iam api-key-create $IAM_APIKEY_NAME --file $IAM_APIKEY_NAME.txt
     ```console
     ibmcloud resource groups
     OK
-    Name      ID                                 Default Group   State   
-    Default   282d2f25256540499cf99b43b34025bf   true            ACTIVE   
+    Name      ID                                 Default Group   State
+    Default   282d2f25256540499cf99b43b34025bf   true            ACTIVE
     ```
 
     If you do not have a resource group yet, create one,
@@ -89,7 +89,7 @@ ibmcloud iam api-key-create $IAM_APIKEY_NAME --file $IAM_APIKEY_NAME.txt
     ```console
     COS_BUCKET=$COS_NAME-bucket1
     COS_STORAGECLASS=Standard
-    ibmcloud cos create-bucket --bucket $COS_BUCKET --ibm-service-instance-id $COS_GUID --class $COS_STORAGECLASS 
+    ibmcloud cos create-bucket --bucket $COS_BUCKET --ibm-service-instance-id $COS_GUID --class $COS_STORAGECLASS
     ```
 
 1. Verify the new bucket was created successfully.

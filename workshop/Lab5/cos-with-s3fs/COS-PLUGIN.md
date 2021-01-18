@@ -29,7 +29,7 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
     Hang tight while we grab the latest from your chart repositories...
     ...Successfully got an update from the "ibm-charts" chart repository
-    Update Complete. ⎈ Happy Helming!⎈ 
+    Update Complete. ⎈ Happy Helming!⎈
     ```
 
 1. Download and unzip the `IBM Cloud Object Storage` plugin to your client, then install the plugin to your cluster from local client.
