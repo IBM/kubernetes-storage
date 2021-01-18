@@ -22,7 +22,7 @@ You now have an Object Storage instance with a bucket, and have found the corres
     API endpoint: https://cloud.ibm.com
     Region: us-south
 
-    Password> 
+    Password>
     Authenticating...
     OK
 

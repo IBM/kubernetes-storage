@@ -40,7 +40,6 @@ WORK_DIR=`pwd`
 
 1. Ensure that you have run through the prerequistes in [Lab0](../Lab0/README.md)
 
-
 ## Using IBM Cloud Block Storage with Kubernetes
 
 Log into the Kubernetes cluster and create a project where we want to deploy our application.
@@ -113,9 +112,9 @@ helm repo list
 You should see a list of repos available to you as seen below:
 
 ```bash
-NAME      	URL
-bitnami   	https://charts.bitnami.com/bitnami
-iks-charts	https://icr.io/helm/iks-charts
+NAME       URL
+bitnami    https://charts.bitnami.com/bitnami
+iks-charts https://icr.io/helm/iks-charts
 ```
 
 ## Mongodb with block storage
@@ -161,7 +160,7 @@ spec:
 
 ### Install Mongodb
 
-Before we install MongoDB we need to generate a password for our database credentials. These credentials will be used in the application to authenticate with the database. 
+Before we install MongoDB we need to generate a password for our database credentials. These credentials will be used in the application to authenticate with the database.
 
 For this lab, will be using the [openssl](https://www.openssl.org/) tool to generate the password as this is a common open source cryptographic library. The rest of the command will strip out any characters that could cause issues with the password.
 
@@ -203,7 +202,7 @@ View the objects being created by the helm chart.
 kubectl get all -n mongo
 ```
 
-```
+```bash
 NAME                    TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)     AGE
 service/mongo-mongodb   ClusterIP   172.21.242.70   <none>        27017/TCP   17s
 
@@ -227,8 +226,8 @@ mongo-mongodb   Pending                                      ibmc-block-gold   2
 
 After waiting for some time. The pod supporting Mongodb should have a  `Running` status.
 
-```
-$ kubectl get all -n mongo     
+```bash
+$ kubectl get all -n mongo
 NAME                                 READY   STATUS    RESTARTS   AGE
 pod/mongo-mongodb-66d7bcd7cf-vqvbj   1/1     Running   0          8m37s
 
@@ -244,7 +243,8 @@ replicaset.apps/mongo-mongodb-6f8f7cd789   0         0         0       12m
 ```
 
 And the PVC `mongo-mongodb` is now bound to volume `pvc-2f423668-4f87-4ae4-8edf-8c892188b645`
-```
+
+```bash
 $ kubectl get pvc -n mongo
 NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 mongo-mongodb   Bound    pvc-2f423668-4f87-4ae4-8edf-8c892188b645   20Gi       RWO            ibmc-block-gold   2m26s
@@ -298,7 +298,7 @@ This file will contain the connection information to our MongoDB instance. These
 
 1. Open the `server/model-config.json` file and change the `entry.datasource` value to `mongo` as seen below:
 
-```
+```json
 ...
 "entry": {
     "dataSource": "mongo",
@@ -355,7 +355,7 @@ As part of the deployment, kubernetes will copy the database connection informat
 ...
 env:
   - name: MONGO_HOST
-    valueFrom: 
+    valueFrom:
       configMapKeyRef:
         name: mongo-config
         key: mongo_host
@@ -469,7 +469,7 @@ guestbook-v1-9465dcbb4-8z8bt     1/1     Running   0          87s
 mongo-mongodb-757d9777d7-q64lg   1/1     Running   0          9m13s
 ```
 
-1. Refresh your browser tab that had the guestbook application and you will see that your data has indeed persisted after our pod went down. 
+1. Refresh your browser tab that had the guestbook application and you will see that your data has indeed persisted after our pod went down.
 
 ![new pod](./images/newPod.png)
 

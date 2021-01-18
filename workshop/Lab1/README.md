@@ -4,13 +4,13 @@ Storing data in containers or worker nodes are considered as the [non-persistent
 In this lab, we will explore storage options on the IBM Kubernetes worker nodes. Follow this [lab](https://github.com/remkohdev/docker101/tree/master/workshop/lab-3) is you are interested in learning more about container-based storage.
 
 The lab covers the following topics:
+
 - Create and claim IBM Kubernetes [non-persistent](https://cloud.ibm.com/docs/containers?topic=containers-storage_planning#non_persistent_overview) storage based on the primary and secondary storage available on the worker nodes.
 - Make the volumes available in the `Guestbook` application.
 - Use the volumes to store application cache and debug information.
 - Access the data from the guestbook container using the Kubernetes CLI.
 - Assess the impact of losing a pod on data retention.
 - Claim back the storage resources and clean up.
-
 
 The primary storage maps to the volume type `hostPath` and the secondary storage maps to `emptyDir`. Learn more about Kubernetes volume types [here](https://Kubernetes.io/docs/concepts/storage/volumes/).
 
@@ -28,7 +28,7 @@ cd $HOME/guestbook-config/storage/lab1
 Let's start with reserving the Persistent volume from the primary storage.
 Review the yaml file `pv-hostpath.yaml`. Note the values set for `type`, `storageClassName` and `hostPath`.
 
-```console
+```yaml
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -46,7 +46,8 @@ spec:
 ```
 
 Create the persistent volume as shown in the command below:
-```
+
+```bash
 kubectl create -f pv-hostpath.yaml
 persistentvolume/guestbook-primary-pv created
 
@@ -55,9 +56,10 @@ NAME                                       CAPACITY   ACCESS MODES   RECLAIM POL
 guestbook-primary-pv                       10Gi       RWO            Retain           Available                           manual                      13s
 ```
 
-Next 
+Next
 PVC yaml:
-```
+
+```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -73,7 +75,7 @@ spec:
 
 Create PVC:
 
-```
+```bash
 kubectl create -f pvc-hostpath.yaml
 persistentvolumeclaim/guestbook-local-pvc created
 ❯ kubectl get pvc
@@ -81,19 +83,19 @@ NAME                  STATUS   VOLUME                                     CAPACI
 guestbook-local-pvc   Bound    guestbook-local-pv                         10Gi       RWX            manual             6s
 ```
 
-
 ## Guestbook application using storage
 
 The application is the [Guestbook App](https://github.com/IBM/guestbook-nodejs), which is a simple multi-tier web application built using the loopback framework.
 
 Change to the guestbook application source directory:
 
-```
+```bash
 cd $HOME/guestbook-nodejs/src
 ```
+
 Review the source `common/models/entry.js`. The application uses storage allocated using `hostPath` to store data cache in the file `data/cache.txt`. The file `logs/debug.txt` records debug messages provisioned using the `emptyDir` storage type.
 
-```source
+```javascript
 module.exports = function(Entry) {
 
     Entry.greet = function(msg, cb) {
@@ -114,7 +116,7 @@ module.exports = function(Entry) {
 
 Run the commands listed below to build the guestbook image and copy into the docker hub registry:
 
-```
+```bash
 docker build -t $DOCKERUSER/guestbook-nodejs:storage .
 docker login -u $DOCKERUSER
 docker push $DOCKERUSER/guestbook-nodejs:storage
@@ -122,7 +124,7 @@ docker push $DOCKERUSER/guestbook-nodejs:storage
 
 Review the deployment yaml file `guestbook-deplopyment.yaml` prior to deploying the application into the cluster.
 
-```
+```bash
 cd $HOME/guestbook-config/storage/lab1
 cat guestbook-deployment.yaml
 ```
@@ -130,7 +132,7 @@ cat guestbook-deployment.yaml
 Replace the first part of `image` name with your docker hub user id.
 The section `spec.volumes` lists `hostPath` and `emptyDir` volumes. The section `spec.containers.volumeMounts` lists the mount paths that the application uses to write in the volumes.
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -157,14 +159,13 @@ metadata:
           claimName: guestbook-primary-pvc
       - name: guestbook-secondary-volume
         emptyDir: {}
-  
 
 ...
 ```
 
 Deploy the Guestbook application:
 
-```
+```bash
 kubectl create -f guestbook-deployment.yaml
 deployment.apps/guestbook-v1 created
 
@@ -178,7 +179,7 @@ service/guestbook created
 
 Find the URL for the guestbook application by joining the worker node external IP and service node port.
 
-```
+```bash
 HOSTNAME=`kubectl get nodes -o wide | tail -n 1 | awk '{print $7}'`
 SERVICEPORT=`kubectl get svc guestbook -o=jsonpath='{.spec.ports[0].nodePort}'`
 echo "http://$HOSTNAME:$SERVICEPORT"
@@ -190,7 +191,7 @@ Open the URL in a browser and create guest book entries.
 
 Next, inspect the data. To do this, run a bash process inside the application container using `kubectl exec`. Reference the pod name from the previous `kubectl get pods` command. Once inside the container, use the subsequent comands to inspect the data.
 
-```
+```bash
 kubectl exec -it [POD NAME] -- bash
 
 root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# ls -al
@@ -245,7 +246,7 @@ tmpfs                    7.9G     0  7.9G   0% /sys/firmware
 
 While still inside the container, create a file on the container file system. This file will not persist when we kill the container. Then run `/sbin/killall5` to terminate the container.
 
-```
+```bash
 root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# touch dontdeletemeplease
 root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# ls dontdeletemeplease
 dontdeletemeplease
@@ -254,14 +255,16 @@ root@guestbook-v1-66798779d6-fqh2j:/home/node/app# command terminated with exit 
 ```
 
 The `killall5` command will kick you out of the container (which is no longer running), but the pod is still running. Verify this with `kubectl get pods`. Not the **0/1** status indicating the application container is no longer running.
-```
+
+```bash
 kubectl get pods
 NAME                            READY   STATUS             RESTARTS   AGE
 guestbook-v1-66798779d6-fqh2j   0/1     CrashLoopBackOff   2          16m
 ```
 
 After a few seconds, the Pod will restart the container:
-```
+
+```bash
 kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 guestbook-v1-66798779d6-fqh2j   1/1     Running   3          16m
@@ -269,7 +272,7 @@ guestbook-v1-66798779d6-fqh2j   1/1     Running   3          16m
 
 Run a bash process inside the container to inspect your data again:
 
-```
+```bash
 kubectl exec -it [POD NAME] -- bash
 
 root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# cat data/cache.txt
@@ -291,11 +294,12 @@ root@guestbook-v1-6f55cb54c5-jb89d:/home/node/app# ls dontdeletemeplease
 ls: dontdeletemeplease: No such file or directory
 
 ```
+
 Notice how the storage from the primary (`hostPath`) and secondary (`emptyDir`) storage types persisted beyond the lifecycle of the container, but the `dontdeletemeplease` file, did not.
 
 Next, we'll kill the pod to see the impact of deleting the pod on data.
 
-```
+```bash
 kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 guestbook-v1-6f55cb54c5-jb89d   1/1     Running   0          12m
@@ -315,7 +319,7 @@ Enter new data:
 
 Log into the pod to view the state of the data.
 
-```
+```bash
 kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 guestbook-v1-5cbc445dc9-sx58j   1/1     Running   0          86s
@@ -354,7 +358,7 @@ Normally Kubernetes clusters have multiple worker nodes in a cluster with replic
 
 ## Clean up
 
-```
+```bash
 cd $HOME/guestbook-config/storage/lab1
 kubectl delete -f .
 ```

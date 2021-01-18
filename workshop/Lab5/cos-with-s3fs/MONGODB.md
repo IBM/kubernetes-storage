@@ -239,7 +239,7 @@ To verify MongoDB deployment,
    connecting to: mongodb://127.0.0.1:27017/?authSource=admin&compressors=disabled&gssapiServiceName=mongodb
     Implicit session: session { "id" : UUID("80b52ae7-b35a-4da9-827e-9daad510aadf") }
     MongoDB server version: 4.4.2
-    > 
+    >
     ```
 
 1. Switch to your database.

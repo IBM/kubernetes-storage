@@ -9,7 +9,7 @@ This section is broken up into the following steps:
 
 Ensure you have an IBM Cloud ID
 
-![Cloud Sign up](../.gitbook/assets/ibm-cloud-sign-up.png)
+![Cloud Sign up](../images/assets/ibm-cloud-sign-up.png)
 
 ## 2. Download or clone the repo
 
@@ -23,4 +23,3 @@ Alternately, run the following command:
 git clone https://github.com/IBM/workshop-template
 cd workshop-template
 ```
-

@@ -7,7 +7,7 @@ The plug-in has two components:
 1. a dynamic provisioner (Object Storage Bucket Provisioner), and
 1. a FlexVolume driver (Kube FlexDriver) for mounting the buckets using `s3fs-fuse` on a worker node. You can read more about Filesystems for User Spaces (FUSE) and `s3fs-fuse` in the [s3fs-fuse lab](../fuse/README.md).
 
-![IBM Cloud Object Storage plugin architecture](../../.gitbook/ibmcos-plugin-arch.png)
+![IBM Cloud Object Storage plugin architecture](../../images/ibmcos-plugin-arch.png)
 
 See: [Fundamentals of IBM Cloud Object Storage](https://medium.com/ai-platforms-research/fundamentals-of-ibm-cloud-storage-solutions-8739f36f024e.)
 

@@ -3,6 +3,7 @@
 This lab demonstrates the use of cloud based file storage with Kubernetes. It uses the IBM Cloud File Storage which is persistent, fast, and flexible network-attached, NFS-based File Storage capacity ranging from 25 GB to 12,000 GB capacity with up to 48,000 IOPS. The IBM Cloud File Storage provides data across all worker nodes within a single availability zone.
 
 Following topics are covered in this exercise:
+
 - Claim a classic file storage volume.
 - Make the volumes available in the `Guestbook` application.
 - Copy media files such as images into the volume using the Kubernetes CLI.
@@ -22,7 +23,8 @@ kubectl get storageclasses
 ```
 
 Expected output:
-```
+
+```bash
 $ kubectl get storageclasses
 
 default                    ibm.io/ibmc-file   Delete          Immediate           false                  27m
@@ -41,11 +43,13 @@ ibmc-file-silver-gid       ibm.io/ibmc-file   Delete          Immediate         
 
 IKS comes with storage class definitions for file storage. This lab uses the storage class `ibm-file-silver`. Note that the default class is `ibmc-file-gold` is allocated if storgage class is not expliciity definded.
 
-```
+```bash
 kubectl describe storageclass ibmc-file-silver
 ```
+
 Expected output:
-```
+
+```bash
 $ kubectl describe storageclass ibmc-file-silver
 
 Name:            ibmc-file-silver
@@ -69,7 +73,7 @@ IBM Cloud File Storage provides fast access to your data for a cluster running i
 
 Review the yaml for the file storage `PersistentVolumeClaim`. When we create this `PersistentVolumeClaim`, it automatically creates it within an availability zone where the worker nodes are located.
 
-```
+```bash
 cd guestbook-config/storage/lab2
 cat pvc-file-silver.yaml
 
@@ -89,34 +93,42 @@ spec:
 ```
 
 Create the PVC
+
 ```bash
 kubectl apply -f pvc-file-silver.yaml
 ```
+
 Expected output:
-```
+
+```bash
 $ kubectl create -f pvc-file-silver.yaml
 persistentvolumeclaim/guestbook-filesilver-pvc created
 ```
 
 Verify the PVC claim is created with the status `Bound`. This may take a minute or two.
+
 ```bash
 kubectl get pvc guestbook-filesilver-pvc
 ```
+
 Expected output:
 
-```
-$  kubectl get pvc guestbook-filesilver-pvc
+```bash
+$ kubectl get pvc guestbook-filesilver-pvc
 NAME                       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS       AGE
 guestbook-filesilver-pvc   Bound    pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9   20Gi       RWX            ibmc-file-silver   2m
 ```
 
 Details associated with the `pv`. Use the `pv` name from the previous command output.
+
 ```bash
 kubectl get pv [pv name]
 ```
+
 Expected output:
-```
-$ kubectl get pv pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9 
+
+```bash
+$ kubectl get pv pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9
 NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                              STORAGECLASS       REASON   AGE
 pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9   20Gi       RWX            Delete           Bound    default/guestbook-filesilver-pvc   ibmc-file-silver            90s
 ```
@@ -125,7 +137,7 @@ pvc-a7cb12ed-b52b-4342-966a-eceaf24e42a9   20Gi       RWX            Delete     
 
 Change to the guestbook application source directory and review the html files `images.html` and `index.html`. `images.html` has the code to display the images stored in the file storage.
 
-```
+```bash
 cd $HOME/guestbook-nodejs/src
 cat client/images.html
 cat client/index.html
@@ -134,7 +146,7 @@ cat client/index.html
 Run the commands listed below to build the guestbook image and copy into the docker hub registry:
 (Skip this step if you have already completed lab 1.)
 
-```
+```bash
 cd $HOME/guestbook-nodejs/src
 docker build -t $DOCKERUSER/guestbook-nodejs:storage .
 docker login -u $DOCKERUSER
@@ -143,7 +155,7 @@ docker push $DOCKERUSER/guestbook-nodejs:storage
 
 Review the deployment yaml file `guestbook-deplopyment.yaml` prior to deploying the application into the cluster.
 
-```
+```bash
 cd $HOME/guestbook-config/storage/lab2
 cat guestbook-deployment.yaml
 ```
@@ -151,7 +163,7 @@ cat guestbook-deployment.yaml
 Replace the first part of the `image` name with your docker hub user id.
 The section `spec.volumes` references the `file`  volume PVC. The section `spec.containers.volumeMounts` has the mount path to store images in the volumes.
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -180,12 +192,16 @@ Deploy the Guestbook application.
 kubectl create -f guestbook-deployment.yaml
 kubectl create -f guestbook-service.yaml
 ```
+
 Verify the Guestbook application is runing.
-```
+
+```bash
 kubectl get all
 ```
+
 Expected output:
-```
+
+```bash
 $ kubectl get all
 NAME                                READY   STATUS    RESTARTS   AGE
 pod/guestbook-v1-5bd76b568f-cdhr5   1/1     Running   0          13s
@@ -204,17 +220,20 @@ replicaset.apps/guestbook-v1-5bd76b568f   2         2         2       13s
 
 Check the mount path inside the pod container. Get the pod listing.
 
-```
+```bash
 $ kubectl get pods
 NAME                            READY   STATUS    RESTARTS   AGE
 guestbook-v1-5bd76b568f-cdhr5   1/1     Running   0          78s
 guestbook-v1-5bd76b568f-w6h6h   1/1     Running   0          78s
 ```
+
 Set these variables for each of your pod names:
-```
+
+```bash
 export POD1=[FIRST POD NAME]
 export POD2=[SECOND POD NAME]
 ```
+
 Log into any one of the pod. Use one of the pod names from the previous command output.
 
 ```bash
@@ -268,7 +287,7 @@ Note the filesystem `fsf-dal1003d-fz.adn.networklayer.com:/IBM02SEV2058850_2177/
 
 Find the URL for the guestbook application by joining the worker node external IP and service node port.
 
-```
+```bash
 HOSTNAME=`kubectl get nodes -ojsonpath='{.items[0].metadata.labels.ibm-cloud\.kubernetes\.io\/external-ip}'`
 SERVICEPORT=`kubectl get svc guestbook -o=jsonpath='{.spec.ports[0].nodePort}'`
 echo "http://$HOSTNAME:$SERVICEPORT"
@@ -281,6 +300,7 @@ Verify that the images are missing by viewing the data from the Guestbook applic
 ## Load the file storage with images
 
 Run the `kubectl cp` command to move the images into the mounted volume.
+
 ```bash
 cd $HOME/guestbook-config/storage/lab2
 kubectl cp images $POD1:/home/node/app/client/
@@ -294,7 +314,7 @@ Refresh the page `images.html` page in the guestbook application to view the upl
 
 Login into the other pod `$POD2` to verify the volume mount.
 
-```
+```bash
 kubectl exec -it $POD2 -- bash
 root@guestbook-v1-5bd76b568f-w6h6h:/home/node/app# ls -alt /home/node/app/client/images
 total 160
@@ -324,12 +344,14 @@ Note that the volume and the data are available on all the pods running the Gues
 
 IBM Cloud File Storage is a NFS-based file storage that is available across all worker nodes within a single availability zone. If you are running a cluster with multiple nodes (within a single AZ) you can run the following commands to prove that your data is available across different nodes:
 
-```
+```bash
 kubectl get pods -o wide
 kubectl get nodes
 ```
+
 Expected output:
-```
+
+```bash
 $ kubectl get pods -o wide
 NAME                            READY   STATUS    RESTARTS   AGE   IP               NODE            NOMINATED NODE   READINESS GATES
 guestbook-v1-6fb8b86876-n9jtz   1/1     Running   0          39h   172.30.224.70    10.38.216.205   <none>           <none>
@@ -356,7 +378,6 @@ Data is available to all nodes within the availability zone where the file stora
 - **ReadOnlyMany**: The PVC can be mounted by multiple pods. All pods have read-only access.
 - **ReadWriteOnce**: The PVC can be mounted by one pod only. This pod can read from and write to the volume.
 
-
 ## [Optional exercises]
 
 Another way to see that the data is persisted at the availability zone level, you can:
@@ -369,22 +390,25 @@ Another way to see that the data is persisted at the availability zone level, yo
 ## Clean up
 
 List all the PVCs and PVs
-```
+
+```bash
 kubectl get pvc
 kubectl get pv
 ```
 
 Delete all the pods using the PVC.
 Delete the PVC
-```
+
+```bash
 kubectl delete pvc guestbook-pvc
 
 persistentvolumeclaim "guestbook-pvc" deleted
 ```
+
 List PV to ensure that it is removed as well.
 Cancel the physical storage volume from the cloud account. (Note: requires admin permissions?)
 
-```
+```bash
 ibmcloud sl file volume-list --columns id  --columns notes | grep pvc-6362f614-258e-48ee-a596-62bb4629cd75
 
 183223942   {"plugin":"ibm-file-plugin-7b9db9c79f-86x8w","region":"us-south","cluster":"bugql3nd088jsp8iiagg","type":"Endurance","ns":"default","pvc":"guestbook-pvc","pv":"pvc-6362f614-258e-48ee-a596-62bb4629cd75","storageclass":"ibmc-file-silver","reclaim":"Delete"}
