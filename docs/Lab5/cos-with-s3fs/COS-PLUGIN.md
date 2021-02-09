@@ -1,4 +1,4 @@
-# Setup the IBM Cloud Object Storage Plugin
+# 5. Configure the Object Storage Plugin
 
 You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, using the Helm CLI tool in this section.
 
@@ -200,4 +200,4 @@ You are going to install the `IBM Cloud Object Storage Plugin` in your cluster, 
 
 ## Next
 
-[Create the PersistentVolumeClaim](PVC.md)
+[6. Create the PersistentVolumeClaim](PVC.md)
