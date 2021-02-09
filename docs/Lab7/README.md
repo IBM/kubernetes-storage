@@ -4,7 +4,7 @@ This lab configures our nodejs guestbook application to connect to an external d
 
 With a managed database service, you can take advantage of the provided service's built features for scaling, security, etc. If you'd rather implement your own database service, check out the previous labs in this workshop.
 
-### Prereqs
+## Prereqs
 
 1. Before you begin, follow the prereqs in [Lab0](../Lab0/README.md).
 
