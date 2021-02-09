@@ -7,7 +7,7 @@ site_author: IBM Developer
 repo_name: kube-storage101
 repo_url: https://github.com/ibm/kube-storage101
 edit_uri: edit/master/docs
-docs_dir: workshop
+docs_dir: docs
 
 # Navigation
 nav:
@@ -20,6 +20,8 @@ nav:
     - Lab 3. Block Storage with Kubernetes: Lab3/README.md
     - Lab 4. Kubernetes StatefulSets: Lab4/README.md
     - Lab 5. Object Storage with Kubernetes: Lab5/README.md
+    - Lab 6. Software Defined Storage (SDS) with Portworx, coming soon...
+    - Lab 7. Connecting to External Storage: Lab7/README.md
 
 ## DO NOT CHANGE BELOW THIS LINE
 
@@ -33,14 +35,16 @@ theme:
     text: IBM Plex Sans
     code: IBM Plex Mono
   icon:
-    logo: material/library
+    logo: ibm_8bar_reverse_2
   features:
     - navigation.tabs
     #- navigation.instant
+    - navigation.expand
   palette:
     scheme: default
-    primary: blue
+    primary: black
     accent: blue
+  custom_dir: overrides
 
 # Plugins
 plugins:
