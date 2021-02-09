@@ -12,6 +12,8 @@
 * [Lab 3: Block storage with kubernetes](Lab3/README.md)
 * [Lab 4: Kubernetes StatefulSets](Lab4/README.md)
 * [Lab 5: Object Storage with Kubernetes](Lab5/README.md)
+* [Lab 6: Using Software Defined Storage (SDS) with Portworx](Lab6/README.md)
+* [Lab 7: Connecting to External Storage](Lab7/README.md)
 
 ### Resources
 

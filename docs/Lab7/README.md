@@ -1,14 +1,16 @@
 # Lab 7. Connecting to External Storage
+
 This lab configures our nodejs guestbook application to connect to an external database, outside of the kubernetes cluster where the guestbook app is deployed. We will be using a managed database service offered on IBM Cloud, but you can apply the concepts in this lab to connect to any external database service such as a legacy database you might have running on premise.
 
 With a managed database service, you can take advantage of the provided service's built features for scaling, security, etc. If you'd rather implement your own database service, check out the previous labs in this workshop.
 
-### Prereqs
+## Prereqs
 
 1. Before you begin, follow the prereqs in [Lab0](../Lab0/README.md).
 
 1. Clone the repos
-    ```
+
+    ```console
     cd $HOME
     git clone https://github.com/IBM/guestbook-nodejs.git guestbook-cloudant
     git clone --branch storage https://github.com/IBM/guestbook-nodejs-config.git
@@ -17,19 +19,19 @@ With a managed database service, you can take advantage of the provided service'
 
 1. Create a new Kubernetes namespace. This will help us avoid conflicts with previous labs. Switch to the new namespace so all subsequent commands will run within that namespace:
 
-    ```
+    ```console
       kubectl create namespace cloudant
       kubectl config set-context --current --namespace=cloudant
     ```
 
 Please choose one of the two options for setting up the database service
+
 - [Approach 1](#Approach-1:-Create-a-database-service-using-the-IBM-Cloud-console)
 - [Approach 2](#-Approach-2:-Use-the-IBM-Cloud-Operator-to-provision-a-database-instance-on-IBM-Cloud)
 
 ## Approach 1: Create a database service using the IBM Cloud console
 
 Follow these steps to create a free `lite` CloudantDB on IBM Cloud using a free IBM Cloud account. [Create an account](https://cloud.ibm.com/registration) if you haven't already.
-
 
 Navigate to the [IBM Cloud Catalog](https://cloud.ibm.com/catalog). Make sure your personal account in selected in the dropdown in the upper right. Search for **Cloudant** in the search bar and click the **Cloudant** tile. (Click **Log In** in the upper righthand side if you are not logged in).
 
@@ -41,9 +43,9 @@ Set the instance name to "mycloudant". Select "IAM and legacy credentials" to **
 
 ### Create a credential for your CloudantDB service
 
-Locate your credentials in your CloudantDB service on IBM Cloud. From the IBM Cloud resource page, search for **mycloudant** to find your Cloudant service. 
+Locate your credentials in your CloudantDB service on IBM Cloud. From the IBM Cloud resource page, search for **mycloudant** to find your Cloudant service.
 
-![cloudant in resource list](../.gitbook/assets/cloudant-in-resource-list.png)
+![cloudant in resource list](../images/assets/cloudant-in-resource-list.png)
 
 From the Cloudant DB service, select **Service Credentials** on the left. Then click the blue **New credential** on the right.
 
@@ -53,13 +55,13 @@ Select the default name and role (should be `manager`) for the credentials, and 
 
 Expand the credential and take note of the **url** parameter. We will be using this value to populate a Kubernetes secret in the next step.
 
-![Cloudant URL](../.gitbook/assets/cloudant-url.png)
+![Cloudant URL](../images/assets/cloudant-url.png)
 
 ### Save your credentials in a Kubernetes `secret`
 
 From a terminal where you are connected to your kubernetes cluster, run the following command to save the URL to your cloudant service in your cluster as a secret:
 
-```
+```console
 kubectl create secret generic binding-cloudant --from-literal=url=[CLOUDANT_URL]
 ```
 
@@ -73,17 +75,17 @@ With the IBM Cloud Kubernetes Service clusters at version 1.16 and later, the Op
 
 ### Create an API Key for your Target Account
 
-We will configure the IBM Cloud Operator to manage resources on your personal IBM Cloud Account. You will be able to create and manage a Cloudant DB lite service that only you will have access to. 
+We will configure the IBM Cloud Operator to manage resources on your personal IBM Cloud Account. You will be able to create and manage a Cloudant DB lite service that only you will have access to.
 
 Note: The account that your Cloudant service will be created on MAY be different than the account where your Kubernetes cluster is located, so please keep that in mind. If you are participating in a workshop with the IBM Developer Advocacy team, we do this to avoid creating multiple lite cloudantDB services on the shared account where all the k8s clusters are running (IBM Cloud accounts are limited to 1 lite instance per service)
 
 1. Login to your personal IBM Cloud account. Use `--sso` if using single-sign-on. Select your personal account when asked upon logging in.
 
-    ```bash
+    ```console
     ibmcloud login
     ```
 
-    ```bash
+    ```console
     $ ibmcloud login
     API endpoint: https://cloud.ibm.com
     Region: us-south
@@ -107,37 +109,37 @@ Note: The account that your Cloudant service will be created on MAY be different
 
 1. Create a service ID in IBM Cloud IAM. If possible, do not use spaces in the names for your IAM credentials. When you use the operator binding feature, any spaces are replaced with underscores.
 
-    ```bash
+    ```console
     ibmcloud iam service-id-create serviceid-ico
     ```
 
 1. Assign the service ID access to the required permissions to work with the IBM Cloud services. You will need the **Manager** role to provision a Cloudant service.
 
-    ```
+    ```console
     ibmcloud iam service-policy-create serviceid-ico --roles Manager,Administrator --resource-group-name default --region us-south
     ```
 
-1. We will also need to provide Account Management to allow us to create an cloudant service on our IBM Cloud account: 
+1. We will also need to provide Account Management to allow us to create an cloudant service on our IBM Cloud account:
 
-    ```
+    ```console
     ibmcloud iam service-policy-create serviceid-ico --account-management --roles Administrator
     ```
 
 1. Create an API key for the service ID.
 
-    ```bash
+    ```console
     ibmcloud iam service-api-key-create apikey-ico serviceid-ico
     ```
 
 1. Set the API key of the service ID as your CLI environment variable. Now, when you run the installation script, the script uses the service ID's API key.
 
-    ```bash
+    ```console
     export IBMCLOUD_API_KEY=<apikey-ico-value>
     ```
 
 1. Confirm that the API key environment variable is set in your CLI.
 
-    ```bash
+    ```console
     echo $IBMCLOUD_API_KEY
     ```
 
@@ -223,9 +225,9 @@ For an application running within a Kubernetes cluster to be able to access an I
 
 ### Debug
 
-    If the credentials have not been created after a few moments, check the logs of the kubernetes object you created.
+If the credentials have not been created after a few moments, check the logs of the kubernetes object you created.
 
-```
+```console
 kubectl describe service.ibmcloud.ibm.com/mycloudant
 ```
 
@@ -303,13 +305,14 @@ Remember this name as we will be using it later when we deploy our application.
 You will have to make minor changes to the Guestbook nodejs application to read from your newly created CloudantDB service.
 
 Navigate to your guestbook application:
-```
+
+```console
 cd guestbook-cloudant/src
 ```
 
 (Optional) Install the [Loopback connector](https://loopback.io/doc/en/lb2/Cloudant-connector.html) for CloudantDB. This has been done for you already.
 
-```
+```console
 cd guestbook-cloudant/src
 npm install loopback-connector-cloudant --save
 ```
@@ -352,12 +355,13 @@ Modify `src/server/model-config.json` to reference the datasource you just creat
 
 Build a docker images with the changes and push to DockerHub. In this lab, we are building and pushing locally. In real-life, we would use CI/CD process to build and push our docker image from source control.
 
-Build the docker image
-  ```
-  docker build -t $DOCKERUSER/guestbook-nodejs:cloudant .
-  docker login -u $DOCKERUSER
-  docker push $DOCKERUSER/guestbook-nodejs:cloudant
-  ```
+Build the docker image,
+
+```console
+docker build -t $DOCKERUSER/guestbook-nodejs:cloudant .
+docker login -u $DOCKERUSER
+docker push $DOCKERUSER/guestbook-nodejs:cloudant
+```
 
 Your guestbook application is all set to talk to a Cloudant database. Next, we will configure our Kubernetes deployment to use the image you just pushed, and to load the missing environment variables: `CLOUDANT_URL` and `CLOUDANT_DB` from our `binding-cloudant` secret.
 
@@ -367,12 +371,12 @@ We have a yaml file created for you, but you will need to enter the location of 
 
 Navigate to the location of your yaml deployment files, and inspect.
 
-```
+```console
 cd $HOME/guestbook-nodejs-config/storage/lab7
 cat guestbook-deployment.yaml
 ```
 
-```
+```console
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -408,29 +412,28 @@ template:
         value: "[DB_NAME]"
 ```
 
-
 Replace `[IMAGE_NAME]` in the file `guestbook-deployment-cloudant.yaml` with the name of the image you uploaded to Docker Hub. Replace `[DB_NAME]` with the name of the Cloudant Database your created in a previous step.
-    
+
 Notice how we load the environment variable `CLOUDANT_URL` from the `binding-cloudant` secret. This yaml files now defines all the environment variables our guestbook application needs to connect to our Cloudant DB.
 
 ### Test your changes by deploying to Kubernetes
 
 Deploy to kubernetes using `kubectl apply`:
 
-```
+```console
 kubectl apply -f guestbook-deployment.yaml
 kubectl apply -f guestbook-service.yaml
 ```
 
 Check your pods. If there are any errors, use `kubectl describe pod [POD NAME]` to debug,
-```
+
+```console
 kubectl get pods
 ```
 
-
 Find the URL for the guestbook application by joining the worker node external IP and service node port.
 
-```
+```console
 HOSTNAME=`kubectl get nodes -ojsonpath='{.items[0].metadata.labels.ibm-cloud\.kubernetes\.io\/external-ip}'`
 SERVICEPORT=`kubectl get svc guestbook -o=jsonpath='{.spec.ports[0].nodePort}'`
 echo "http://$HOSTNAME:$SERVICEPORT"
@@ -438,10 +441,10 @@ echo "http://$HOSTNAME:$SERVICEPORT"
 
 Navigate to the guestbook in a broswer, and add some entries:
 
-![guestbook](../.gitbook/assets/guestbook.png)
+![guestbook](../images/assets/guestbook.png)
 
 From the Cloudant Dashboard, selected `myDatabase` and you should see documents created for the entries you created.
-![guestbook](../.gitbook/assets/cloudant-docs.png)
+
+![guestbook](../images/assets/cloudant-docs.png)
 
 This Cloudant database service is external to the Kubernetes service and data persists outside of the lifecycle of the container/pod/kubernetes cluster. The Cloudant service is a scalable json document storage solution that can be distributed across regions. For more information, check out the [Cloudant Product Page](https://www.ibm.com/cloud/cloudant).
-
