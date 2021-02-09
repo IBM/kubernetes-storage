@@ -12,3 +12,5 @@ The introductory page of the workshop is broken down into the following sections
 * [Lab 3: Block storage with kubernetes](Lab3/README.md)
 * [Lab 4: Kubernetes StatefulSets](Lab4/README.md)
 * [Lab 5: Object Storage with Kubernetes](Lab5/README.md)
+* Lab 6: Software Defined Storage (SDS) with Portworx, coming soon...
+* [Lab 7: Connecting to External Storage](Lab7/README.md)
