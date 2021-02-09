@@ -1,4 +1,4 @@
-# Setup MongoDB
+# 7. Deploy MongoDB using Object Storage
 
 ## Deploy MongoDB to Cluster and Persist its Datastore in IBM Cloud Object Storage
 

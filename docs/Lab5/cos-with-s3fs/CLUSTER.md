@@ -1,4 +1,4 @@
-# Configure your Cluster
+# 4. Configure your Kubernetes Cluster
 
 You now have an Object Storage instance with a bucket, and have found the corresponding private endpoint for your Object Storage. Next, we can configure a Kubernetes cluster:
 
@@ -116,4 +116,4 @@ secret/cos-write-access created
 
 ## Next
 
-[Setup the Cloud Object Storage plugin](COS-PLUGIN.md)
+[5. Configure the Object Storage plugin](COS-PLUGIN.md)

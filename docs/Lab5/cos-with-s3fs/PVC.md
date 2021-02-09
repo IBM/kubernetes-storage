@@ -1,4 +1,4 @@
-# Create a PersistentVolumeClaim
+# 6. Create the PersistentVolumeClaim
 
 Depending on the settings that you choose in your PVC, you can provision IBM Cloud Object Storage in the following ways:
 
@@ -117,4 +117,4 @@ You're now ready to persist data on the IBM Cloud Object Storage within your con
 
 ## Next
 
-[Setup MongoDB](MONGODB.md)
+[7. Deploy MongoDB using Object Storage](MONGODB.md)

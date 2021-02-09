@@ -1,4 +1,4 @@
-# Setup Object Storage
+# 3. Create Object Storage Instance
 
 In this section, you will create an instance of IBM Cloud Object Storage (COS), create credentials and a bucket to store your persistent data for MongoDB.
 
@@ -94,7 +94,7 @@ Steps:
     echo $RESOURCEGROUP
     ```
 
-## Create an Object Storage Instance
+## Create an IBM Cloud Object Storage Instance
 
 The Lite service plan for Cloud Object Storage includes Regional and Cross Regional resiliency, flexible data classes, and built in security. For the sample application, I will choose the `standard` and `regional` options in the `ibmc-s3fs-standard-regional` storageclass that is typical for web or mobile apps and we don't need cross-regional resilience beyond resilience per zones for our workshop app, but the options to choose for usage strategies and therefor the pricing of storageclasses for the bucket is very granular.
 
@@ -285,11 +285,8 @@ The `IBM Cloud Object Storage plugin` uses the `private endpoint` of the Object 
    1. Locate and select your IBM Cloud Object Storage service instance.
    1. In the left menu, select the `buckets` section Select your new `bucket` in the `Buckets` tab.
    1. Select the `Configuration` tab under `Buckets` iin the left pane.
-
-       ![Buckets](../images/cos-04.png)
-
    1. Take note of the `Private` endpoint. It should match your environment variable `$COS_PRIVATE_ENDPOINT`.
 
 ## Next
 
-[Configure your Kubernetes Cluster](CLUSTER.md)
+[4. Configure your Kubernetes Cluster](CLUSTER.md)

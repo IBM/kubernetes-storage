@@ -33,4 +33,4 @@ Related labs using Object Storage are:
 
 ## Next
 
-[Setup](../setup/README.md)
+[1. Setup](../setup/README.md)

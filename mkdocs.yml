@@ -19,8 +19,16 @@ nav:
     - Lab 2. File Storage with Kubernetes: Lab2/README.md
     - Lab 3. Block Storage with Kubernetes: Lab3/README.md
     - Lab 4. Kubernetes StatefulSets: Lab4/README.md
-    - Lab 5. Object Storage with Kubernetes: Lab5/README.md
-    - Lab 6. Software Defined Storage (SDS) with Portworx, coming soon...
+    - Lab 5. Object Storage with Kubernetes:
+      - 0. About: Lab5/README.md
+      - 1. Setup: Lab5/setup/README.md
+      - 2. About Object Storage: Lab5/cos-with-s3fs/ABOUT-COS.md
+      - 3. Create Object Storage Instance: Lab5/cos-with-s3fs/COS.md
+      - 4. Configure your Kubernetes Cluster: Lab5/cos-with-s3fs/CLUSTER.md
+      - 5. Configure the Object Storage Plugin: Lab5/cos-with-s3fs/COS-PLUGIN.md
+      - 6. Create the PersistentVolumeClaim: Lab5/cos-with-s3fs/PVC.md
+      - 7. Deploy MongoDB using Object Storage: Lab5/cos-with-s3fs/MONGODB.md
+    - Lab 6. Software Defined Storage (SDS) with Portworx, coming soon...: Lab6/README.md
     - Lab 7. Connecting to External Storage: Lab7/README.md
 
 ## DO NOT CHANGE BELOW THIS LINE
@@ -39,7 +47,7 @@ theme:
   features:
     - navigation.tabs
     #- navigation.instant
-    - navigation.expand
+    #- navigation.expand
   palette:
     scheme: default
     primary: black
