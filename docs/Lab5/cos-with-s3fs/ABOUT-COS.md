@@ -1,4 +1,4 @@
-## About Object Storage
+# About Object Storage
 
 In `object storage` or `Object-based Storage Devices (OSD)`, data is organized into flexible-sized objects that abstract the physical blocks of data, in contrast to block-oriented interfaces that read and write fixed sized blocks of data, like `file storage` or `block storage`. Objects include data, a globally unique identifier and metadata for indexing and management.
 
@@ -12,7 +12,7 @@ Object storage has the following benefits:
 1. flexible, access from anywhere via REST APIs,
 1. secure, encrypt at-rest and in-transit.
 
-### Usage
+## Usage
 
 Object storage is often used for handling large amounts of unstructured data, including email, video, photos, web pages, audio, sensor data and other types of media and web content, both textual and non-textual.
 
@@ -23,7 +23,7 @@ Use cases are:
 1. cloud native, startups combining cost-effectiveness of cloud native with flexibility of object storage,
 1. data archive, e.g. media files.
 
-### Standards
+## Standards
 
 The International Committee for Information Technology Standards (INCITS) is an American standards organization for computer and communications standards. Its [T10 committee](http://www.t10.org) is devoted to Small Computer Systems Interface (SCSI) technology and this T10 committee has published 2 standards for Object-Based Storage Devices (OSD):
 
