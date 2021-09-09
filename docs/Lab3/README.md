@@ -2,11 +2,11 @@
 
 ## Introduction
 
-When looking at what kind of storage class you would like to use in Kubernetes, there are are a few choices such as file storage, block storage, object storage, etc. If your use case requires fast and reliable data access then consider block storage.
+When looking at what kind of storage class you would like to use in OpenShift, there are a few choices such as file storage, block storage, object storage, etc. If your use case requires fast and reliable data access then consider block storage.
 
 [Block storage](https://www.ibm.com/cloud/learn/block-storage) is a storage option that breaks data into "blocks" and stores those blocks across a Storage Area Network (SAN). These smaller blocks are faster to store and retrieve than large data objects. For this reason, block storage is primarily used as a backing storage for databases.
 
-In this lab we will deploy a Mongo database on top of block storage on Kubernetes.
+In this lab we will deploy a Mongo database on top of block storage on OpenShift.
 
 ![archDiagram](./images/archDiagram.png)
 
@@ -26,66 +26,104 @@ The basic architecture is as follows
 
 Before we get into the lab we first need to do some setup to ensure that the lab will flow smoothly.
 
-<!-- 1. Replace `<docker username>` with your DockerHub username and run the following command (be sure to replace the `< >` too!).
-
-```bash
-DOCKERUSER=<docker username>
-``` -->
-
 1. In your terminal, navigate to where you would like to store the files used in this lab and run the following.
 
-```bash
-WORK_DIR=`pwd`
-```
+  ```bash
+  WORK_DIR=`pwd`
+  ```
 
-1. Ensure that you have run through the prerequistes in [Lab0](../Lab0/README.md)
+1. Log into your Openshift cluster locally by following the folloiwng instructions:
 
-## Using IBM Cloud Block Storage with Kubernetes
+#### Login to IBM Cloud
 
-Log into the Kubernetes cluster and create a project where we want to deploy our application.
+To login to IBM Cloud,
 
-```bash
-kubectl create namespace mongo
-```
+1. Go to [https://cloud.ibm.com](https://cloud.ibm.com) in your browser and login.
 
-## Install Block Storage Plugin
+1. Make sure that you are in the `Advowork` account.
 
-By default IBM Kubernetes Service Clusters don't have the option to deploy block storage persistent volumes. However, there is an easy process to add the block storage `storageClass` to your cluster through the use of an automated helm chart install.
+    ![Account Number](images/account-number.png)
 
-1. Follow the steps outlined [here](https://cloud.ibm.com/docs/containers?topic=containers-block_storage#install_block) to install the block storage `storageClass`.
+  >Note: you may not have access to your OpenShift cluster if you are not in the right account#.
 
-1. First you need to add the `iks-charts` helm repo to your local helm repos. This will allow you to utilize a variety of charts to install software on the IBM Kubernetes Service.
+#### Shell
 
-    ```bash
-    helm repo add iks-charts https://icr.io/helm/iks-charts
+Most of the labs are run using CLI commands.
+
+The IBM Cloud Shell available at [https://shell.cloud.ibm.com](https://shell.cloud.ibm.com) is preconfigured with the full IBM Cloud CLI and tons of plug-ins and tools that you can use to manage apps, resources, and infrastructure.
+
+Before we continue, we need to install Helm v3 in the IBM Cloud shell. For those that have never used Helm before, Helm is a package manager for kubernetes applications. We will be able to deploy software such as MongoDB using helm which will then create the necessary kubernetes objects on our cluster.
+
+To install Helm v3, run the following commands,
+
+1. In the `Cloud Shell`, download and unzip Helm v3.2.
+
+    ```console
+    cd $HOME
+    wget https://get.helm.sh/helm-v3.2.0-linux-amd64.tar.gz
+    tar -zxvf helm-v3.2.0-linux-amd64.tar.gz
     ```
 
-1. Then, we need to update the repo to ensure that we have the latest charts:
+2. Make Helm v3 CLI available in your `PATH` environment variable.
 
-    ```bash
-    helm repo update
+    ```console
+    echo 'export PATH=$HOME/linux-amd64:$PATH' > $HOME/.bash_profile
+    source $HOME/.bash_profile
     ```
 
-1. Install the block storage plugin from the `iks-charts` repo:
+3. Verify Helm v3 installation.
 
-    ```bash
-    helm install block-storage-plugin iks-charts/ibmcloud-block-storage-plugin
+    ```console
+    helm version --short
     ```
 
-1. Lastly, verify that the plugin installation was successful by retrieving the list of storage classes in the cluster:
+    outputs,
 
-    ```bash
-    kubectl get storageclasses
+    ```console
+    $ helm version --short
+    v3.2.0+ge11b7ce
     ```
 
-    You should notice a few options that start with `ibmc-block` as seen below.
+## Login to OpenShift
 
-    ```bash
-    NAME                       PROVISIONER         RECLAIMPOLICY   VOLUMEBINDINGMODE   ALLOWVOLUMEEXPANSION   AGE
-    ibmc-block-bronze          ibm.io/ibmc-block   Delete          Immediate           true                   62s
-    ibmc-block-custom          ibm.io/ibmc-block   Delete          Immediate           true                   62s
-    ibmc-block-gold            ibm.io/ibmc-block   Delete          Immediate           true                   62s
-    ```
+1. In a new browser tab, go to [https://cloud.ibm.com/kubernetes/clusters?platformType=openshift](https://cloud.ibm.com/kubernetes/clusters?platformType=openshift).
+
+1. Make sure the `Advowork` account is selected in the dropdown at the top right of the page,
+
+1. Select your cluster instance and open it.
+
+1. Click `OpenShift web console` button on the top.
+
+    ![IBM Cloud OpenShift Web Console](images/ibmcloudRoksOverview.png)
+
+1. Click on your username in the upper right and select `Copy Login Command` option.
+
+    ![Terminal Button](images/copyLoginCommand.png)
+
+1. Click the `Display Token` link.
+
+1. Copy the contents of the field `Log in with this token` to the clipboard. It provides a login command with a valid token for your username.
+
+    ![OpenShift oc login](./images/openshift-oc-login.png)
+
+1. Go to the your shell terminal.
+
+1. Paste the `oc login command` in the IBM Cloud Shell terminal and run it.
+
+1. Verify you connect to the right cluster.
+
+   ```console
+   oc get all
+   oc get nodes -o wide
+   ```
+
+## Using IBM Cloud Block Storage with OpenShift
+
+Log into the OpenShift cluster and create a project where we want to deploy our application.
+
+  ```bash
+  oc new-project mongo
+  ```
 
 ## Helm Repo setup
 
@@ -114,7 +152,6 @@ You should see a list of repos available to you as seen below:
 ```bash
 NAME       URL
 bitnami    https://charts.bitnami.com/bitnami
-iks-charts https://icr.io/helm/iks-charts
 ```
 
 ## Mongodb with block storage
@@ -135,7 +172,13 @@ This command will test out our helm install command and save the output manifest
 
 Check out the file in your code editor and take a look at the `PersistentVolumeClaim` object. There should be a property named `storageClassName` in the spec and the value should be `ibmc-block-gold` to signify that we will be using block storage for our database.
 
-Below is what that `PersistentVolumeClaim` object should look like.
+You can run the following command to view the contents of the `mongodb-install-dryrun.yaml` file to see what will be created on the cluster by helm.
+
+```bash
+cat mongdb-install-dryrun.yaml 
+```
+
+Below is what that `PersistentVolumeClaim` object should look like. This PersistantVolumeClaim is a request to get access to 8GB of block storage. This storage can be bound to applications to be used as persistent storage, which is what will be done with the MongoDB.
 
 ```yaml
 kind: PersistentVolumeClaim
@@ -171,7 +214,7 @@ USER_PASS=`openssl rand -base64 12 | tr -d "=+/"`
 Now we can install MongoDB and supply the password that we just generated.
 
 ``` bash
-helm install mongo bitnami/mongodb --set global.storageClass=ibmc-block-gold,auth.password=$USER_PASS,auth.username=guestbook-admin,auth.database=guestbook -n mongo
+helm install mongo bitnami/mongodb --set global.storageClass=ibmc-block-gold,auth.password=$USER_PASS,auth.username=guestbook-admin,auth.database=guestbook,containerSecurityContext.enabled=false,podSecurityContext.enabled=false -n mongo
 ```
 
 Here's an explanation of the above command:
@@ -199,7 +242,7 @@ NOTES:
 View the objects being created by the helm chart.
 
 ```bash
-kubectl get all -n mongo
+oc get all -n mongo
 ```
 
 ```bash
@@ -216,7 +259,7 @@ replicaset.apps/mongo-mongodb-6f8f7cd789   1         0         0       17s
 View the list of persistence volume claims. Note that the `mongo-mongodb` is pending volume allocation.
 
 ```bash
-kubectl get pvc -n mongo
+oc get pvc -n mongo
 ```
 
 ```bash
@@ -227,7 +270,7 @@ mongo-mongodb   Pending                                      ibmc-block-gold   2
 After waiting for some time. The pod supporting Mongodb should have a  `Running` status.
 
 ```bash
-$ kubectl get all -n mongo
+$ oc get all -n mongo
 NAME                                 READY   STATUS    RESTARTS   AGE
 pod/mongo-mongodb-66d7bcd7cf-vqvbj   1/1     Running   0          8m37s
 
@@ -245,168 +288,227 @@ replicaset.apps/mongo-mongodb-6f8f7cd789   0         0         0       12m
 And the PVC `mongo-mongodb` is now bound to volume `pvc-2f423668-4f87-4ae4-8edf-8c892188b645`
 
 ```bash
-$ kubectl get pvc -n mongo
+$ oc get pvc -n mongo
 NAME            STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 mongo-mongodb   Bound    pvc-2f423668-4f87-4ae4-8edf-8c892188b645   20Gi       RWO            ibmc-block-gold   2m26s
 ```
 
 With MongoDB deployed now we need to deploy an application that will utilize it as a datastore.
 
-### Building Guestbook
+### The Guestbook Application
 
 For this lab we will be using the guestbook application which is a common sample kubernetes application. However, the version that we are using has been refactored as a loopback application.
 
 1. Clone the application repo and the configuration repo. In your terminal, run the following:
 
-```bash
-cd $WORK_DIR
-git clone https://github.com/IBM/guestbook-nodejs.git
-git clone https://github.com/IBM/guestbook-nodejs-config/ --branch mongo
-```
+  ```bash
+  cd $WORK_DIR
+  git clone https://github.com/IBM/guestbook-nodejs.git --branch mongo-db
+  git clone https://github.com/IBM/guestbook-nodejs-config/ --branch lab
+  ```
 
 1. Then, navigate into the `guestbook-nodejs` directory.
 
-```bash
-cd $WORK_DIR/guestbook-nodejs/src
-```
+  ```bash
+  cd $WORK_DIR/guestbook-nodejs/src
+  ```
 
-1. Replace the code in the `server/datasources.json` file with the following:
+1. Run the following command to view the datasource configuration for our application which is in `server/datasources.json` file
 
-```json
-{
-  "in-memory": {
-    "name": "in-memory",
-    "localStorage": "",
-    "file": "",
-    "connector": "memory"
-  },
-  "mongo": {
-    "host": "${MONGO_HOST}",
-    "port": "${MONGO_PORT}",
-    "url": "",
-    "database": "${MONGO_DB}",
-    "password": "${MONGO_PASS}",
-    "name": "mongo",
-    "user": "${MONGO_USER}",
-    "useNewUrlParser": true,
-    "connector": "mongodb"
+  ```bash
+  cat server/datasources.json
+  ```
+
+  You should see the following:
+
+  ```json
+  {
+    "in-memory": {
+      "name": "in-memory",
+      "localStorage": "",
+      "file": "",
+      "connector": "memory"
+    },
+    "mongo": {
+      "host": "${MONGO_HOST}",
+      "port": "${MONGO_PORT}",
+      "url": "",
+      "database": "${MONGO_DB}",
+      "password": "${MONGO_PASS}",
+      "name": "mongo",
+      "user": "${MONGO_USER}",
+      "useNewUrlParser": true,
+      "connector": "mongodb"
+    }
   }
-}
-```
+  ```
 
-This file will contain the connection information to our MongoDB instance. These variables will be passed into the environment from ConfigMaps and Secrets that we will create.
+  This file will contain the connection information to our MongoDB instance. These variables will be passed into the environment from ConfigMaps and Secrets that we will create.
 
-1. Open the `server/model-config.json` file and change the `entry.datasource` value to `mongo` as seen below:
 
-```json
-...
-"entry": {
-    "dataSource": "mongo",
-    "public": true
+1. This application has a file located at `server/model-config.json` that will tell the application which datasource to use. Use the following command to take a look at the file:
+
+  ```bash
+  cat server/model-config.json
+  ```
+
+  You should see the following section at the bottom of the file:
+
+  ```json
+  ...
+  "entry": {
+      "dataSource": "mongo",
+      "public": true
+    }
   }
-}
-```
+  ```
 
-In this file we are telling the application which datasource we should use; in-memory or MongoDB. By default the application comes with an in-memory datastore for storing information but this data does not persist after the application crashes or if the pod goes down for any reason. We are changing `in-memory` to `mongo` so that the data will persist in our MongoDB instance external to the application so that the data will remain even after the application crashes.
-
-1. Now we need to build our application image and push it to DockerHub.
-
-```bash
-cd $WORK_DIR/guestbook-nodejs/src
-IMAGE_NAME=$DOCKERUSER/guestbook-nodejs:mongo
-docker build -t $IMAGE_NAME .
-docker login -u $DOCKERUSER
-docker push $IMAGE_NAME
-```
+  In this file we are telling the application which datasource we should use; in-memory or MongoDB. By default the application comes with an in-memory datastore for storing information but this data does not persist after the application crashes or if the pod goes down for any reason. We are using `mongo` so that the data will persist in our MongoDB instance external to the application so that the data will remain even after the application crashes.
 
 ### Deploying Guestbook
 
-Now that we have built our application, let's check out the manifest files needed to deploy it to Kubernetes.
+Now that we have our application, let's check out the manifest files needed to deploy it to OpenShift.
 
 1. Navigate to the configuration repo that we cloned earlier.
 
-```bash
-cd $WORK_DIR/guestbook-nodejs-config
-```
+  ```bash
+  cd $WORK_DIR/guestbook-nodejs-config
+  ```
 
-This repo contains 3 manifests that we will be deploying to our cluster today:
+  This repo contains 3 manifests that we will be deploying to our cluster today:
 
-- A deployment manifest
-- A service manifest
-- A configMap manifest
+  - A deployment manifest
+  - A service manifest
+  - A configMap manifest
 
-These manifests will create their respective kubernetes objects on our cluster.
+  These manifests will create their respective kubernetes objects on our cluster.
 
-The `deployment` will deploy our application image that we built earlier while the `service` will expose that application to external traffic. The `configMap` will contain connection information for our database such as database hostname and port.
+  The `deployment` will deploy the application that we took a look at earlier as a single container while the `service` will expose that application to external traffic. The `configMap` will contain connection information for our database such as database hostname and port.
 
-1. Open the `guestbook-deployment.yaml` file and edit line 25 to point to the image that you built and pushed earlier. Do this by replacing `<DockerUsername>` with your docker username. (Don't forget to replace the `< >` too!)
+1. Let's take a look at the deployment file by running the following command:
 
-For example, my Docker username is `odrodrig` so line 25 in my `guestbook-deployment.yaml` file would look like this:
+  ```bash
+  cat guestbook-deployment.yaml
+  ```
 
-```yaml
-...
-  image: odrodrig/guestbook-nodejs:mongo
-...
-```
+  You should see the following:
 
-As part of the deployment, kubernetes will copy the database connection information from the configMap into the environment of the application. You can see where this is specified in the `env` section of the deployment manifest as seen below:
+  ```yaml
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: guestbook-v1
+    labels:
+      app: guestbook
+      version: "1.0"
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        app: guestbook
+    template:
+      metadata:
+        labels:
+          app: guestbook
+          version: "1.0"
+      spec:
+        containers:
+        - name: guestbook
+          resources:
+            limits:
+              cpu: 1
+              memory: 512M
+          image: odrodrig/guestbook-nodejs:mongo
+          imagePullPolicy: Always
+          ports:
+          - name: http-server
+            containerPort: 3000
+          env:
+            - name: MONGO_HOST
+              valueFrom: 
+                configMapKeyRef:
+                  name: mongo-config
+                  key: mongo_host
+            - name: MONGO_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-config
+                  key: mongo_port
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: username
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: password
+            - name: MONGO_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: mongo-config
+                  key: mongo_db_name
+  ```
 
-```yaml
-...
-env:
-  - name: MONGO_HOST
-    valueFrom:
-      configMapKeyRef:
-        name: mongo-config
-        key: mongo_host
-  - name: MONGO_PORT
-    valueFrom:
-      configMapKeyRef:
-        name: mongo-config
-        key: mongo_port
-  - name: MONGO_USER
-    valueFrom:
-      secretKeyRef:
-        name: mongodb
-        key: username
-  - name: MONGO_PASS
-    valueFrom:
-      secretKeyRef:
-        name: mongodb
-        key: password
-  - name: MONGO_DB
-    valueFrom:
-      configMapKeyRef:
-        name: mongo-config
-        key: mongo_db_name
-```
+  As part of the deployment, OpenShift will copy the database connection information from the configMap into the environment of the application. You can see where this is specified in the `env` section of the deployment manifest as seen below:
 
-You might also notice that we are getting our database username (`MONGO_USER`) and password (`MONGO_PASS`) from a kubernetes secret. We haven't defined that secret yet so let's do it now.
+  ```yaml
+  ...
+  env:
+    - name: MONGO_HOST
+      valueFrom:
+        configMapKeyRef:
+          name: mongo-config
+          key: mongo_host
+    - name: MONGO_PORT
+      valueFrom:
+        configMapKeyRef:
+          name: mongo-config
+          key: mongo_port
+    - name: MONGO_USER
+      valueFrom:
+        secretKeyRef:
+          name: mongodb
+          key: username
+    - name: MONGO_PASS
+      valueFrom:
+        secretKeyRef:
+          name: mongodb
+          key: password
+    - name: MONGO_DB
+      valueFrom:
+        configMapKeyRef:
+          name: mongo-config
+          key: mongo_db_name
+  ```
 
-```bash
-kubectl create secret generic mongodb --from-literal=username=guestbook-admin --from-literal=password=$USER_PASS -n mongo
-```
+  You might also notice that we are getting our database username (`MONGO_USER`) and password (`MONGO_PASS`) from a kubernetes secret. We haven't defined that secret yet so let's do it now.
+
+  ```bash
+  oc create secret generic mongodb --from-literal=username=guestbook-admin --from-literal=password=$USER_PASS -n mongo
+  ```
 
 1. Now we are ready to deploy the application. Run the following commands:
 
-```bash
-cd $WORK_DIR/guestbook-nodejs-config/
-kubectl apply -f . -n mongo
-```
+  ```bash
+  cd $WORK_DIR/guestbook-nodejs-config/
+  oc apply -f . -n mongo
+  ```
 
-Ensure that the application pod is running:
+  Ensure that the application pod is running:
 
-```bash
-kubectl get pods -n mongo
-```
+  ```bash
+  oc get pods -n mongo
+  ```
 
-You should see both the mongo pod and the guestbook pod running now:
+  You should see both the mongo pod and the guestbook pod running now:
 
-```bash
-NAME                             READY   STATUS    RESTARTS   AGE
-guestbook-v1-9465dcbb4-zdhqv     1/1     Running   0          19s
-mongo-mongodb-757d9777d7-j4759   1/1     Running   0          27m
-```
+  ```bash
+  NAME                             READY   STATUS    RESTARTS   AGE
+  guestbook-v1-9465dcbb4-zdhqv     1/1     Running   0          19s
+  mongo-mongodb-757d9777d7-j4759   1/1     Running   0          27m
+  ```
 
 ### Test out the application
 
@@ -415,8 +517,8 @@ Now that we have deployed the application, let's test it out.
 1. Find the URL for the guestbook application by joining the worker node external IP and service node port. Run the following to get the IP and service node port of the application:
 
 ```bash
-HOSTNAME=`kubectl get nodes -ojsonpath='{.items[0].metadata.labels.ibm-cloud\.kubernetes\.io\/external-ip}'`
-SERVICEPORT=`kubectl get svc guestbook -n mongo -o=jsonpath='{.spec.ports[0].nodePort}'`
+HOSTNAME=`oc get nodes -ojsonpath='{.items[0].metadata.labels.ibm-cloud\.kubernetes\.io\/external-ip}'`
+SERVICEPORT=`oc get svc guestbook -n mongo -o=jsonpath='{.spec.ports[0].nodePort}'`
 echo "http://$HOSTNAME:$SERVICEPORT"
 ```
 
@@ -430,44 +532,44 @@ echo "http://$HOSTNAME:$SERVICEPORT"
 
 1. Find the name of the pod that is running our application:
 
-```bash
-kubectl get pods -n mongo
-```
+  ```bash
+  oc get pods -n mongo
+  ```
 
-Copy the name of the pod that starts with `guestbook`. For me, the pod is named `guestbook-v1-9465dcbb4-f6s9h`.
+  Copy the name of the pod that starts with `guestbook`. For me, the pod is named `guestbook-v1-9465dcbb4-f6s9h`.
 
-```bash
-NAME                             READY   STATUS    RESTARTS   AGE
-guestbook-v1-9465dcbb4-f6s9h     1/1     Running   0          4m7s
-mongo-mongodb-757d9777d7-q64lg   1/1     Running   0          5m47s
-```
+  ```bash
+  NAME                             READY   STATUS    RESTARTS   AGE
+  guestbook-v1-9465dcbb4-f6s9h     1/1     Running   0          4m7s
+  mongo-mongodb-757d9777d7-q64lg   1/1     Running   0          5m47s
+  ```
 
 1. Then, run the following command, replacing `<pod name>` with pod name that you just copied.
 
-```bash
-kubectl delete pod -n mongo <pod name>
-```
+  ```bash
+  oc delete pod -n mongo <pod name>
+  ```
 
-You should then see a message saying that your pod has been deleted.
+  You should then see a message saying that your pod has been deleted.
 
-```bash
-$ kubectl delete pod -n mongo guestbook-v1-9465dcbb4-f6s9h
-pod "guestbook-v1-9465dcbb4-f6s9h" deleted
-```
+  ```bash
+  $ oc delete pod -n mongo guestbook-v1-9465dcbb4-f6s9h
+  pod "guestbook-v1-9465dcbb4-f6s9h" deleted
+  ```
 
 1. Now, view your pods again:
 
-```bash
-kubectl get pods -n mongo
-```
+  ```bash
+  oc get pods -n mongo
+  ```
 
-You should see the guestbook pod is back now with and the age has been reset. This means that it is a brand new pod that kubernetes has deployed automatically after our previous pod was deleted.
+  You should see the guestbook pod is back now with and the age has been reset. This means that it is a brand new pod that OpenShift has deployed automatically after our previous pod was deleted.
 
-```bash
-NAME                             READY   STATUS    RESTARTS   AGE
-guestbook-v1-9465dcbb4-8z8bt     1/1     Running   0          87s
-mongo-mongodb-757d9777d7-q64lg   1/1     Running   0          9m13s
-```
+  ```bash
+  NAME                             READY   STATUS    RESTARTS   AGE
+  guestbook-v1-9465dcbb4-8z8bt     1/1     Running   0          87s
+  mongo-mongodb-757d9777d7-q64lg   1/1     Running   0          9m13s
+  ```
 
 1. Refresh your browser tab that had the guestbook application and you will see that your data has indeed persisted after our pod went down.
 
@@ -475,7 +577,7 @@ mongo-mongodb-757d9777d7-q64lg   1/1     Running   0          9m13s
 
 ## Summary
 
-In this lab we used block storage to run our own database on Kubernetes. Block storage allows for fast I/O operations making it ideal for our application database. We utilized configMaps and secrets to store the database configuration making it easy to use this application with different database configurations without making code changes.
+In this lab we used block storage to run our own database on OpenShift. Block storage allows for fast I/O operations making it ideal for our application database. We utilized configMaps and secrets to store the database configuration making it easy to use this application with different database configurations without making code changes.
 
 ## Cleanup (Optional)
 
@@ -485,7 +587,7 @@ This part of the lab desrcibes the steps to delete what was built in the lab.
 
 ```bash
 cd $WORK_DIR/guestbook-nodejs-config
-kubectl delete -f . -n mongo
+oc delete -f . -n mongo
 ```
 
 ### Uninstalling Mongo
@@ -497,5 +599,5 @@ helm uninstall mongo -n mongo
 ### Remove namespace
 
 ```bash
-kubectl delete namespace mongo
+oc delete namespace mongo
 ```
