@@ -36,6 +36,8 @@ Before we get into the lab we first need to do some setup to ensure that the lab
 
 #### Login to IBM Cloud
 
+If you are using the [IBM Cloud Shell](https://cloud.ibm.com/shell), you will be already logged into IBM Cloud and you can skip this step.
+
 To login to IBM Cloud,
 
 1. Go to [https://cloud.ibm.com](https://cloud.ibm.com) in your browser and login.
@@ -50,11 +52,21 @@ To login to IBM Cloud,
 
 Most of the labs are run using CLI commands.
 
-The IBM Cloud Shell available at [https://shell.cloud.ibm.com](https://shell.cloud.ibm.com) is preconfigured with the full IBM Cloud CLI and tons of plug-ins and tools that you can use to manage apps, resources, and infrastructure.
+The IBM Cloud Shell available at [https://shell.cloud.ibm.com](https://shell.cloud.ibm.com) is preconfigured with the full IBM Cloud CLI and tons of plug-ins and tools that you can use to manage apps, resources, and infrastructure. 
 
-Before we continue, we need to install Helm v3 in the IBM Cloud shell. For those that have never used Helm before, Helm is a package manager for kubernetes applications. We will be able to deploy software such as MongoDB using helm which will then create the necessary kubernetes objects on our cluster.
+For those that have never used Helm before, Helm is a package manager for kubernetes applications. We will be able to deploy software such as MongoDB using helm which will then create the necessary kubernetes objects on our cluster.
 
-To install Helm v3, run the following commands,
+Helm v3 is already installed in the IBM Cloud shell but an alias needs to be added to use the `helm3` command via the default `helm` command.
+
+```console
+$ alias helm=helm3
+$ helm version
+version.BuildInfo{Version:"v3.2.1", GitCommit:"fe51cd1e31e6a202cba7dead9552a6d418ded79a", GitTreeState:"clean", GoVersion:"go1.13.10"}
+```
+
+If you are using the IBM Cloud Shell with the alias, you can skip the rest of the instructions.
+
+To install Helm v3 in other shell clients, run the following commands,
 
 1. In the `Cloud Shell`, download and unzip Helm v3.2.
 
@@ -85,6 +97,26 @@ To install Helm v3, run the following commands,
     ```
 
 ## Login to OpenShift
+
+### Login using the CLI and system:admin User
+
+1. If you cannot access the OpenShift Console and are using the IBM Cloud Shell, list the clusters in your account,
+
+    ```console
+    ibmcloud ks clusters
+    ```
+
+1. Select your cluster and connect using the OpenShift admin user. You need the right permissions on your user to access your cluster as admin,
+
+    ```console
+    $ export CLUSTER_NAME=<cluster name>
+    $ ibmcloud ks cluster config -c $CLUSTER_NAME --admin
+    The configuration for pnc-roks-lab-027 was downloaded successfully.
+
+    Added context for pnc-roks-lab-027 to the current kubeconfig file.
+    ```
+
+### Login Using the OpenShift Console and the IBM Cloud IAM User
 
 1. In a new browser tab, go to [https://cloud.ibm.com/kubernetes/clusters?platformType=openshift](https://cloud.ibm.com/kubernetes/clusters?platformType=openshift).
 
